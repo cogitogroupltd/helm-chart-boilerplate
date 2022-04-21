@@ -1,0 +1,16 @@
+{{- if and (.Values.configMap.enabled) (.Values.configMap.files) -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "{{ .Values.configMap.name }}"
+  labels:
+    {{- include "generic.labels" $ | nindent 4 }}
+data:
+{{- if .Values.configMap.files }}
+{{- range $key, $value := .Values.configMap.files }}
+  {{ $key }}: |-
+{{ $value | indent 4 }}
+{{ "" | indent 0 }}
+{{- end -}}
+{{- end -}}
+{{- end -}}

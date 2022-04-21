@@ -1,0 +1,38 @@
+replicaCount: 6
+
+image: 
+  repository: 12345.dkr.ecr.eu-west-2.amazonaws.com/app1
+  tag: "prd-latest"
+  pullPolicy: "Always"
+
+serviceAccount:
+  enabled: true
+  annotations:
+    # eks.amazonaws.com/role-arn: "arn:aws:iam::12345:role/app1"
+    eks.amazonaws.com/role-arn: "arn:aws:iam::12345:role/staging-fargate-ecs-task-execution-role"
+
+service:
+  type: ClusterIP
+  enabled: true
+  # nodePort: 32560
+  port: 80
+  targetPort: 80
+
+
+env:
+  AWS_REGION: "eu-west-2"
+  DB_PASSWORD: ${DB_PASSWORD}
+
+persistence:
+  enabled: false
+
+# command:
+# - sh
+# - -c
+
+# args:
+# - sleep infinity
+
+configMap:
+  enabled: false
+  envFrom: false
