@@ -1,0 +1,25 @@
+{{- if and .Values.persistence.enabled .Values.persistence.persistentVolumes}}
+{{- range $value := .Values.persistence.persistentVolumes }}
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ $value.name }}
+spec:
+  capacity:
+    storage: {{ $value.size }}
+  volumeMode: {{ $value.volumeMode }}
+  accessModes:
+    - {{ $value.accessMode }}
+  claimRef:
+    namespace: {{ $.Release.Namespace }}
+    name: {{ $value.claimRef }}
+  persistentVolumeReclaimPolicy: {{ $value.reclaimPolicy }}
+  storageClassName: {{ $value.storageClassName }}
+  local:
+    path: {{ $value.localPath }}
+  {{- with $value.nodeAffinityRules}}
+  {{- toYaml . | nindent 2 }}
+  {{- end }}
+---
+{{ end }}
+{{ end }}

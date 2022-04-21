@@ -1,0 +1,1 @@
+helm upgrade --install sshd ./charts/common --values ./charts/sshd/example-values.yaml

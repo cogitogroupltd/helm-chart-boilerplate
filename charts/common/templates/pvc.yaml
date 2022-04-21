@@ -1,0 +1,22 @@
+{{- if .Values.persistence.enabled }}
+{{- range $value := .Values.persistence.pvcs }}
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ $value.name }}
+  namespace: {{ $.Release.Namespace }}
+  labels:
+    app: {{ include "generic.fullname" $ }}
+    version: "{{ $.Values.image.tag | default $.Chart.AppVersion }}"
+    {{- include "generic.labels" $ | nindent 4 }}
+spec:
+  storageClassName: {{ $value.storageClassName }}
+  accessModes:
+    - {{ $value.accessMode }}
+  resources:
+    requests:
+      storage: {{ $value.size }}
+---
+{{ end }}
+{{ end }}

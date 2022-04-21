@@ -1,0 +1,21 @@
+{{ if .Values.service.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "generic.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "generic.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - name: http
+      port: {{ .Values.service.port }}
+      targetPort: {{ .Values.service.targetPort }}
+      {{ if or (eq .Values.service.type "NodePort") (.Values.service.nodePort)}}
+      nodePort: {{ .Values.service.nodePort }}
+      {{ end }}
+      protocol: TCP
+  selector:
+    {{- include "generic.selectorLabels" . | nindent 4 }}
+{{ end }}

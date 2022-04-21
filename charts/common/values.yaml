@@ -1,0 +1,154 @@
+# Default values
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+
+
+replicaCount: 1
+
+image:
+  repository: ""
+  pullPolicy: Always
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "latest"
+
+deploymentLabels: {}
+
+imagePullSecrets:
+- name: regcred
+
+redisSidecar: 
+  enabled: false
+  image: redis
+  pullPolicy: Always
+  targetPort: 6379
+  livenessInterval: 30
+
+nameOverride: ""
+fullnameOverride: ""
+
+urlPath: {}
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: false
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 80
+
+# Set the default probes to the endpoints already implemented in the dotnet service chassis
+livenessProbe: {}
+
+readinessProbe: {}
+
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 1
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+nodeSelector:
+  beta.kubernetes.io/os: linux
+  beta.kubernetes.io/arch: amd64
+
+env: []
+
+tolerations: []
+
+affinity: {}
+
+configMap:
+  enabled: false
+  envFrom: false
+
+# eg. hooks can be used to prepopulate a DB before the Kubernetes deployment starts
+hook: 
+  enabled: false
+  image:
+    repository: "mcr.microsoft.com/mssql-tools"
+    pullPolicy: Always
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: "1.0.0"
+  # env:
+  #   DATABASE_NAME: example1
+  # args: ["source /scripts/sleep.sh"] 
+  # files: 
+  #   sleep.sh: | 
+  #     sleep 100000
+
+# hostAliases:
+# - ip: "127.0.0.1"
+#   hostnames:
+#   - "redis"
+
+persistence:
+  enabled: false
+  storageClassName: default
+  size: 10Gi
+  accessMode: ReadWriteMany
+
+extraVolumeMounts: []
+extraVolumes: []
+
+# Inline option to mount a file into a configMap
+configMap:
+  enabled: false
+  envFrom: false
+
+# configMap:
+#   enabled: true
+#   name: nginx-conf
+#   files: 
+#     nginx.conf: |
+#       env API_PROXY_CRED;
+#       worker_processes  1;
+#       pid /var/run/openresty/nginx.pid;
+#       events {
+#           worker_connections  1024;
+#       }
+
+
+initContainer:
+  enabled: false
+  image:
+    repository: 
+    tag: 
+    imagePullPolicy: 
+  command: []
+  args: []
+  extraVolumes: []
+  extraVolumeMounts: []
