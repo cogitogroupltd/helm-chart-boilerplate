@@ -31,7 +31,7 @@ urlPath: {}
 
 serviceAccount:
   # Specifies whether a service account should be created
-  create: false
+  enabled: false
   # Annotations to add to the service account
   annotations: {}
   # The name of the service account to use.
@@ -57,6 +57,8 @@ service:
   targetPort: 80
 
 # Set the default probes to the endpoints already implemented in the dotnet service chassis
+startupProbe: {}
+
 livenessProbe: {}
 
 readinessProbe: {}
@@ -90,10 +92,6 @@ env: []
 tolerations: []
 
 affinity: {}
-
-configMap:
-  enabled: false
-  envFrom: false
 
 # eg. hooks can be used to prepopulate a DB before the Kubernetes deployment starts
 hook: 
@@ -142,6 +140,12 @@ configMap:
 #       }
 
 
+# Reference an existing secret and create corresponding VolumeMounts and Volumes 
+# filesFromSecret:
+#   rds-combined-ca-bundle-pem:
+#     secret: rds-combined-ca-bundle
+#     mountPath: /app/certs
+
 initContainer:
   enabled: false
   image:
@@ -152,3 +156,8 @@ initContainer:
   args: []
   extraVolumes: []
   extraVolumeMounts: []
+
+
+# Orleans requires environment configurations
+orleans:
+  enabled: true

@@ -1,5 +1,6 @@
 autoscaling:
-  enabled: false
+  enabled: true
+  targetCPUUtilizationPercentage: 80
 
 replicaCount: "2"
 
@@ -9,8 +10,8 @@ image:
   pullPolicy: "Always"
 
 service:
-  type: ClusterIP
   enabled: true
+  type: ClusterIP
   port: 6000
   targetPort: 8080
 
@@ -51,3 +52,13 @@ livenessCheck:
     periodSeconds: 10
     successThreshold: 1
     failureThreshold: 6
+
+startupCheck:
+  startupProbe:
+    tcpSocket:
+      port: http
+    initialDelaySeconds: 5
+    timeoutSeconds: 3
+    periodSeconds: 5
+    successThreshold: 1
+    failureThreshold: 3
