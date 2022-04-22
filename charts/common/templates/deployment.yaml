@@ -10,6 +10,9 @@ metadata:
     {{- with .Values.deploymentLabels }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
+    {{- if .Values.orleans.enabled }}
+    orleans/serviceId: {{ include "generic.fullname" . }}
+    {{- end }}}
 spec:
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
