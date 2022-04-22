@@ -82,8 +82,32 @@ spec:
             - name: http
               containerPort: {{ .Values.service.targetPort }}
               protocol: TCP
-          {{- if .Values.env }}
           env:
+          {{- if .Values.env }}
+          {{- if .Values.orleans.enabled }}
+          # Configure settings to let Orleans know which cluster it belongs to
+          # and which pod it is running in
+          - name: ORLEANS_SERVICE_ID
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.labels['orleans/serviceId']
+          - name: ORLEANS_CLUSTER_ID
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.labels['orleans/clusterId']
+          {{- end }}
+          - name: POD_NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+          - name: POD_IP
+            valueFrom:
+              fieldRef:
+                fieldPath: status.podIP
           {{- range $name, $value := .Values.env }}
           {{- if not (empty $value) }}
           - name: {{ $name | quote }}
@@ -117,6 +141,9 @@ spec:
           {{- toYaml . | nindent 10 }}
           {{- end }}
           {{- with .Values.livenessCheck }}
+          {{- toYaml . | nindent 10 }}
+          {{- end }}
+          {{- with .Values.startupCheck }}
           {{- toYaml . | nindent 10 }}
           {{- end }}
           resources:
