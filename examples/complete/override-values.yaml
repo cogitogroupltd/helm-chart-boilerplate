@@ -1,0 +1,208 @@
+replicaCount: 1
+
+image: 
+  repository: 1234.dkr.ecr.us-east-1.amazonaws.com/nginx
+  tag: "latest"
+  pullPolicy: "IfNotPresent"
+
+imagePullSecrets:
+  - name: regcred
+
+
+initContainers:
+  - name: init
+    image: bitnami/aws-cli:latest
+    imagePullPolicy: IfNotPresent
+    command: ["/bin/bash", "-xc" ]
+    args: 
+      - |
+        TIME=$(date +'%Y-%m-%d-%H-%M-%s')
+        echo "$TIME Starting S3 file download" | tee --append /app/logs/nginx-service-initContainer-s3-copy.log
+        aws s3 cp s3://${AWS_S3_BUCKET_NAME}/*.png /app/data/ | tee --append /app/logs/nginx-service-initContainer-s3-copy.log
+    securityContext:
+      privileged: true
+      runAsUser: 0
+    env:
+      - name: "AWS_ACCESS_KEY_ID"
+        value: "AKIAXICWYKJXEW464WPK"
+      - name: "AWS_SECRET_ACCESS_KEY"
+        value: "OVERRIDE_ME"
+      - name: "AWS_S3_BUCKET_NAME"
+        value: "somebucket"
+    volumeMounts:
+      - mountPath: /app/logs/
+        name: log-dir
+      - mountPath: /app/data/
+        name: data-dir
+      - mountPath: /app/rabbitmq_logs
+        name: rabbitmq-logs
+
+hook:
+  enabled: true
+  image:
+    repository: "my/helm-db-tools"
+    pullPolicy: Always
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: "1.0.0"
+  env:
+    DB_PASSWORD: blab
+    DB_USERNAME: dev
+    DB_SERVER: mssql.dns.name
+    DB_NAME: devdb
+  
+  # # To debug this hook container, uncomment this to override the webhook with a sleep command 
+  # args: ["source /scripts/sleep.sh"]
+  # files:
+  #   sleep.sh: |
+  #     sleep 100000
+
+
+deploymentLabels:
+  branch: develop
+
+env:
+  RABBIT_HOST: rabbitmq.broker.svc.cluster.local
+  RABBIT_USER: rabbit
+  TOPIC_NAME: "test"
+
+secenv:
+  RABBIT_PASSWD: NadmapyefHybIdviGlyilguvminorcAu
+
+extraVolumeMounts:
+  - name: rabbitmq-logs
+    mountPath: /app/rabbitmq_logs
+  - name: log-dir
+    mountPath: /app/logs/
+  - name: data-dir
+    mountPath: /app/data/
+  - name: myrelease-cm-nginx-conf
+    mountPath: /etc/nginx/nginx.conf
+extraVolumes:
+  - name: rabbitmq-logs
+    persistentVolumeClaim:
+      claimName: nginx-service-pvc
+  - name: log-dir
+    persistentVolumeClaim:
+      claimName: nginx-service-logs-pvc
+  - name: data-dir
+    emptyDir: {}
+  - name: myrelease-cm-nginx-conf
+    configMap:
+      name: myrelease-cm-nginx-conf
+
+configMap:
+  enabled: true
+  name: myrelease-cm-nginx-conf #myrelease-app-nginx-conf
+  files: 
+    nginx.conf: |
+      user  nginx;
+      worker_processes  1;
+
+      error_log  /var/log/nginx/error.log warn;
+      pid        /var/run/nginx.pid;
+
+
+      events {
+          worker_connections  1024;
+      }
+
+
+      http {
+          include       /etc/nginx/mime.types;
+          default_type  application/octet-stream;
+
+          log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                              '$status $body_bytes_sent "$http_referer" '
+                              '"$http_user_agent" "$http_x_forwarded_for"';
+
+          access_log  /var/log/nginx/access.log  main;
+
+          keepalive_timeout  65;
+
+          gzip  on;
+
+          include /etc/nginx/conf.d/*.conf;
+      }
+
+
+persistence:
+  enabled: true
+  pvcs:
+  - name: nginx-service-logs-pvc
+    storageClassName: local-path
+    accessMode: ReadWriteMany
+    size: 25Gi
+  - name: nginx-service-pvc
+    storageClassName: local-path
+    accessMode: ReadWriteMany
+    size: 26Gi
+    
+
+  persistentVolumes:
+  - name: nginx-service-logs
+    size: 25Gi
+    volumeMode: Filesystem
+    accessMode: ReadWriteMany
+    claimRef: nginx-service-logs-pvc
+    persistentVolumeReclaimPolicy: Retain
+    storageClassName: local-path
+    localPath: /mnt/logs
+    nodeAffinityRules:
+      nodeAffinity:
+        required:
+          nodeSelectorTerms:
+            - matchExpressions:
+                - key: kubernetes.io/arch
+                  operator: In
+                  values:
+                    - amd64
+  - name: nginx-service-pv
+    size: 26Gi
+    volumeMode: Filesystem
+    accessMode: ReadWriteMany
+    claimRef: nginx-service-pvc
+    persistentVolumeReclaimPolicy: Retain
+    storageClassName: local-path
+    localPath: /mnt/rabbitmq_logs 
+    nodeAffinityRules:
+      nodeAffinity:
+        required:
+          nodeSelectorTerms:
+            - matchExpressions:
+                - key: kubernetes.io/arch
+                  operator: In
+                  values:
+                    - amd64
+                    
+
+  
+
+
+
+readinessCheck:
+  readinessProbe:
+    tcpSocket:
+      port: http
+    initialDelaySeconds: 5
+    timeoutSeconds: 3
+    periodSeconds: 5
+    successThreshold: 1
+    failureThreshold: 3
+livenessCheck:
+  livenessProbe:
+    tcpSocket:
+      port: http
+    initialDelaySeconds: 30
+    timeoutSeconds: 5
+    periodSeconds: 10
+    successThreshold: 1
+    failureThreshold: 6
+startupCheck:
+  startupProbe:
+    tcpSocket:
+      port: http
+    initialDelaySeconds: 5
+    timeoutSeconds: 3
+    periodSeconds: 5
+    successThreshold: 1
+    failureThreshold: 3

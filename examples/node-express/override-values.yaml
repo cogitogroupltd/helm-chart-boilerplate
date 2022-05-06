@@ -1,0 +1,52 @@
+replicaCount: 6
+
+image: 
+  repository: 12345.dkr.ecr.eu-west-2.amazonaws.com/app1
+  tag: "prd-latest"
+  pullPolicy: "Always"
+
+serviceAccount:
+  enabled: true
+  annotations:
+    eks.amazonaws.com/role-arn: "arn:aws:iam::12345:role/staging-fargate-ecs-task-execution-role"
+
+services:
+ - name: main
+   type: ClusterIP
+   port: 80
+   targetPort: 3000
+   protocol: TCP
+ - name: admin
+   type: ClusterIP
+   port: 8080
+   targetPort: 3001
+   protocol: TCP
+
+
+env:
+  AWS_REGION: "eu-west-2"
+  DB_PASSWORD: ${DB_PASSWORD}
+
+persistence:
+  enabled: false
+
+configMap:
+  enabled: false
+  envFrom: false
+
+rawYaml:
+  enabled: true
+  content: |
+    kind: RoleBinding
+    apiVersion: rbac.authorization.k8s.io/v1
+    metadata:
+      name: myrelease-app-pod-reader-binding2
+      namespace: default
+    subjects:
+    - kind: ServiceAccount
+      name: myrelease-app
+      apiGroup: ''
+    roleRef:
+      kind: Role
+      name: myrelease-app-pod-reader
+      apiGroup: ''
