@@ -15,7 +15,16 @@ metadata:
     "helm.sh/hook-weight": "-5"
     "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded,hook-failed
 data:
-{{ (.Files.Glob "scripts/*").AsConfig | indent 2 }}
+{{ (.Files.Glob "files/*").AsConfig | indent 2 }}
+{{ "" | indent 0 }}
+{{- if .Values.hook.files }}
+{{- range $key, $value := .Values.hook.files }}
+  {{ $key }}: |-
+{{ $value | indent 4 }}
+{{ "" | indent 0 }}
+{{- end -}}
+{{- end -}}
+
 ---
 apiVersion: batch/v1
 kind: Job
@@ -40,23 +49,22 @@ spec:
         app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
         app.kubernetes.io/instance: {{ .Release.Name | quote }}
         helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
-      annotations:
-        sidecar.istio.io/inject: "false"
-        # iam.amazonaws.com/role: arn:aws:iam::{{ required "Set aws.accountId" .Values.aws.accountId }}:role/{{ required "Set aws.region" .Values.aws.region }}-v1
     spec:
       restartPolicy: Never
       imagePullSecrets:
-        - name: dummy
+        - name: regcred
       containers:
       - name: job
         image: "{{ .Values.hook.image.repository }}:{{ .Values.hook.image.tag }}"
         command: [ "/bin/bash", "-c", "--" ]
         args: [ "source /scripts/create-user-and-database.sh" ]
         env:
-        - name: AWS_DEFAULT_REGION
-          value: {{ required "Set aws.region" .Values.aws.region }}
-        - name: ENVIRONMENT_NAME
-          value: {{ required "Set environmentName" .Values.environmentName }}
+        {{- range $name, $value := .Values.hook.env }}
+        {{- if not (empty $value) }}
+        - name: {{ $name | quote }}
+          value: {{ $value | quote }}
+        {{- end }}
+        {{- end }}
         volumeMounts:
         - name: scripts-vol
           mountPath: /scripts

@@ -141,10 +141,10 @@ configMap:
 
 
 # Reference an existing secret and create corresponding VolumeMounts and Volumes 
-# filesFromSecret:
-#   rds-combined-ca-bundle-pem:
-#     secret: rds-combined-ca-bundle
-#     mountPath: /app/certs
+filesFromSecret:
+  rds-combined-ca-bundle-pem:
+    secret: rds-combined-ca-bundle
+    mountPath: /app/certs
 
 initContainer:
   enabled: false
@@ -160,4 +160,23 @@ initContainer:
 
 # Orleans requires environment configurations
 orleans:
-  enabled: true
+  enabled: false
+
+
+# Insert raw yaml 
+rawYaml:
+  enabled: false
+  content: |
+    kind: RoleBinding
+    apiVersion: rbac.authorization.k8s.io/v1
+    metadata:
+      name: myrelease-app-pod-reader-binding1
+      namespace: default
+    subjects:
+    - kind: ServiceAccount
+      name: myrelease-app
+      apiGroup: ''
+    roleRef:
+      kind: Role
+      name: myrelease-app-pod-reader
+      apiGroup: ''

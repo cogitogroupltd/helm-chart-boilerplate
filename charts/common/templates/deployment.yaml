@@ -12,7 +12,7 @@ metadata:
     {{- end }}
     {{- if .Values.orleans.enabled }}
     orleans/serviceId: {{ include "generic.fullname" . }}
-    {{- end }}}
+    {{- end }}
 spec:
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
@@ -129,14 +129,15 @@ spec:
           {{- end }}
           {{- end }}
           {{- if or .Values.filesFromSecret .Values.extraVolumeMounts }}
+          volumeMounts:
           {{- if .Values.extraVolumeMounts }}
           {{- toYaml .Values.extraVolumeMounts | nindent 12 }}
           {{- end }}
           {{- with .Values.filesFromSecret }}
           {{- range $key, $value := . }}
-          - name: {{ $key }}
-            mountPath: {{ $value.mountPath }}
-            readOnly: true
+            - name: {{ $key }}
+              mountPath: {{ $value.mountPath }}
+              readOnly: true
           {{- end }}
           {{- end }}
           {{- end }}
@@ -184,9 +185,9 @@ spec:
       {{- end }}
       {{- with .Values.filesFromSecret }}
       {{- range $key, $value := . }}
-      - name: {{ $key }}
-        secret:
-          secretName: {{ $value.secret }}
+        - name: {{ $key }}
+          secret:
+            secretName: {{ $value.secret }}
       {{- end }}
       {{- end }}
       {{- end }}
