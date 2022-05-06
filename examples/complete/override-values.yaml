@@ -49,12 +49,39 @@ hook:
     DB_USERNAME: dev
     DB_SERVER: mssql.dns.name
     DB_NAME: devdb
-  
-  # # To debug this hook container, uncomment this to override the webhook with a sleep command 
-  # args: ["source /scripts/sleep.sh"]
-  # files:
-  #   sleep.sh: |
-  #     sleep 100000
+  args: ["source /scripts/create-user-and-database.sh"]
+  files:
+    create-user-and-database.sh: |
+      #!/bin/bash
+
+      # Example script which will run prior to the main helm chart deploys. 
+      # See .Values.hooks
+
+      # Uncomment and populate these values to run locally
+      # export DB_NAME=devdb
+      # export DB_SERVER=mssql.dns.name
+      # export DB_USERNAME=dev
+      # export DB_PASSWORD=blab
+
+      export SCRIPTS=/scripts
+      cp $SCRIPTS/* $HOME/
+
+      sed -i -e "s/@DATABASE_NAME@/$DB_NAME/g" $HOME/create-user-and-database.sql
+
+      echo "Execution SQL script ..."
+      /opt/mssql-tools/bin/sqlcmd -S "$DB_SERVER" -U $DB_USERNAME -P $DB_PASSWORD -i $HOME/create-user-and-database.sql -o result.txt
+
+      cat result.txt
+
+    create-user-and-database.sql: |
+      /********************************************************************************************************/
+      /* Set the values for your application in this section                          */
+      /********************************************************************************************************/
+
+      use [@DATABASE_NAME@]
+
+      CREATE TABLE hello 
+
 
 
 deploymentLabels:
@@ -206,3 +233,8 @@ startupCheck:
     periodSeconds: 5
     successThreshold: 1
     failureThreshold: 3
+
+filesFromSecret:
+  rds-combined-ca-bundle-pem:
+    secret: rds-combined-ca-bundle
+    mountPath: /app/certs
