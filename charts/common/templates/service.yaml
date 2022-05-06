@@ -1,21 +1,24 @@
-{{ if .Values.service.enabled }}
+{{- if .Values.services }}
+{{- range $value := .Values.services }}
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "generic.fullname" . }}
-  namespace: {{ .Release.Namespace }}
+  name: "{{ include "generic.fullname" $ }}-{{ $value.name }}"
+  namespace: {{ $.Release.Namespace }}
   labels:
-    {{- include "generic.labels" . | nindent 4 }}
+    {{- include "generic.labels" $ | nindent 4 }}
 spec:
-  type: {{ .Values.service.type }}
+  type: {{ $value.type }}
   ports:
     - name: http
-      port: {{ .Values.service.port }}
-      targetPort: {{ .Values.service.targetPort }}
-      {{ if or (eq .Values.service.type "NodePort") (.Values.service.nodePort)}}
-      nodePort: {{ .Values.service.nodePort }}
+      port: {{ $value.port }}
+      targetPort: {{ $value.targetPort }}
+      {{ if and (eq $value.type "NodePort") ($value.nodePort)}}
+      nodePort: {{ $value.nodePort }}
       {{ end }}
-      protocol: TCP
+      protocol: {{ $value.protocol }}
   selector:
-    {{- include "generic.selectorLabels" . | nindent 4 }}
-{{ end }}
+    {{- include "generic.selectorLabels" $ | nindent 4 }}
+---
+{{- end }}
+{{- end }}

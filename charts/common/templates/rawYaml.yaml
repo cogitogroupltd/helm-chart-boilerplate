@@ -1,0 +1,5 @@
+{{- if .Values.rawYaml.enabled }}
+{{- with .Values.rawYaml.content }}
+{{- . }}
+{{- end }}
+{{- end }}
