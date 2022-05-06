@@ -141,10 +141,10 @@ configMap:
 
 
 # Reference an existing secret and create corresponding VolumeMounts and Volumes 
-filesFromSecret:
-  rds-combined-ca-bundle-pem:
-    secret: rds-combined-ca-bundle
-    mountPath: /app/certs
+# filesFromSecret:
+#   rds-combined-ca-bundle-pem:
+#     secret: rds-combined-ca-bundle
+#     mountPath: /app/certs
 
 initContainer:
   enabled: false
