@@ -54,7 +54,7 @@ data:
             {{- end }}
             
             
-            server_name sample.test.io;
+            server_name sample.test.io localhost;
 
             # Add custom pages for errors
             error_page 404 /custom_404.html;
