@@ -1,0 +1,26 @@
+
+whiteListing:
+  enabled: true
+  addresses:
+    ssh_bastion_nat_gateway: "52.1.0.233/32"
+    my_home: "73.176.177.40/32"
+
+image:
+  name: nginx
+  tag: 1.21.6
+  pullPolicy: IfNotPresent
+
+services:
+  - name: "http"
+    type: NodePort
+    nodePort: 30081
+    containerPort: 80
+  - name: "https"
+    type: NodePort
+    nodePort: 30444
+    containerPort: 443
+
+rollingUpdateMaxUnavailable: 0
+
+ssl:
+  enabled: false

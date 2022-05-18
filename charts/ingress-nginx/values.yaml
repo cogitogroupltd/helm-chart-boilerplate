@@ -1,0 +1,36 @@
+useAlternativePorts: false
+
+# Uncomment this if IP whitelisting is not taking effect
+LoadBalancerType: proxy_protocol # proxy_protocol is used for IP whitelisting when using NLBs - use `aws elbv2 modify-target-group-attributes --attributes Key=proxy_protocol_v2.enabled,Value=true --target-group-arn arn:aws:elasticloadbalancing:us-east-1:304793330600:targetgroup/eks-cluster-nlb-https-tg-80db4d8/0f41d883eebbc37e`
+
+whitelisting:
+  enabled: false
+  addresses:
+    example: "1.2.3.4/32" # this will allow all
+
+basicAuth:
+  enabled: false
+  users:
+    admin: SomePassWord.
+
+environment: "prod"
+image:
+  name: nginx
+  tag: 1.17.9
+  pullPolicy: IfNotPresent
+
+service:
+  # type: NodePort
+  # nodePort: 32560
+  hostPort:
+    http: 80
+    https: 443
+  containerPort:
+    http: 80
+    https: 443
+  
+rollingUpdateMaxUnavailable: 1
+
+ssl:
+  enabled: false
+  

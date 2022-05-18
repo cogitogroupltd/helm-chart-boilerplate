@@ -1,0 +1,94 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: "{{ .Release.Name }}-confd"
+  namespace: "{{ .Release.Namespace }}"
+data:
+  healthz.conf: |
+    server {
+            listen  {{ .Values.service.containerPort.http }} default_server;
+        #     listen  {{ .Values.service.containerPort.https }} default_server ssl;
+
+            location /healthz {
+               access_log off;
+               return 200 "healthy\n";
+            }
+        
+            # Redirect to https
+            location / {
+              return 301 https://$host$request_uri;
+            }
+        }
+  sample.test.io.conf: |
+    # sample routing
+    server {
+
+            {{ if .Values.ssl.enabled }}
+            listen {{ .Values.service.containerPort.https }} ssl {{ if eq .Values.LoadBalancerType "proxy_protocol" }} proxy_protocol {{ end }}; 
+            listen [::]:{{ .Values.service.containerPort.https }} ssl {{ if eq .Values.LoadBalancerType "proxy_protocol" }} proxy_protocol {{ end }};
+
+            ssl_certificate /etc/nginx/certs/sample.test.io/tls.crt;
+            ssl_certificate_key /etc/nginx/certs/sample.test.io/tls.key;
+            {{ else }}
+            listen {{ .Values.service.containerPort.http }} {{ if eq .Values.LoadBalancerType "proxy_protocol" }} proxy_protocol {{ end }};
+            listen [::]:{{ .Values.service.containerPort.http }} {{ if eq .Values.LoadBalancerType "proxy_protocol" }} proxy_protocol {{ end }};
+            {{ end }}
+            root /var/www/html;
+
+            # Authentication
+            {{- if and .Values.basicAuth.enabled .Values.whitelisting.enabled }}
+            satisfy all;
+            {{- end }}
+            {{ if .Values.whitelisting.enabled }}
+            {{- range $name, $value := .Values.whitelisting.addresses }}
+            {{- if not (empty $value)  }}
+            allow {{ $value | quote }} ; 
+            {{- end }}
+            {{- end }}
+            deny all ;
+            {{- end }}
+
+            {{- if .Values.basicAuth.enabled }}
+            auth_basic           "Employee Area";
+            auth_basic_user_file /etc/apache2/.htpasswd; 
+            {{- end }}
+            
+            
+            server_name sample.test.io;
+
+            # Add custom pages for errors
+            error_page 404 /custom_404.html;
+            location = /custom_404.html {
+              root /usr/share/nginx/html;
+            }
+
+            error_page 403 /custom_403.html;
+            location = /custom_403.html {
+              root /usr/share/nginx/html;
+            }
+
+            error_page 500 502 503 504 /custom_50x.html;
+            location = /custom_50x.html {
+                    root /usr/share/nginx/html;
+            }
+
+            location / {
+                    resolver                kube-dns.kube-system.svc.cluster.local valid=10s ipv6=off;
+                    resolver_timeout        5s;
+                    proxy_set_header        Host $host;
+                    proxy_set_header        X-Real-IP $remote_addr;
+                    proxy_set_header        X-Forwarded-For $proxy_add_x_forwarded_for;
+                    proxy_set_header        X-Forwarded-Proto $scheme;
+                    proxy_read_timeout      90;
+                    
+                    proxy_http_version      1.1;
+                    proxy_set_header        Upgrade $http_upgrade;
+                    proxy_set_header        Connection "upgrade"; 
+                    set_real_ip_from        10.1.0.0/16;
+                    real_ip_recursive       on;
+                    set $backend            "http://sample.sample.svc.cluster.local:8080";
+
+                    proxy_set_header Host $host;
+                    proxy_pass $backend;
+            }
+    }

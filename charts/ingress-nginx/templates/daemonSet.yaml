@@ -1,0 +1,86 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: {{ .Release.Name }}
+  labels:
+    app.kubernetes.io/name: {{ .Chart.Name }}
+    app.kubernetes.io/part-of: {{ .Chart.Name }}
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ .Chart.Name }}
+      app.kubernetes.io/part-of: {{ .Chart.Name }} 
+  updateStrategy:
+    rollingUpdate:
+      maxUnavailable: {{ .Values.rollingUpdateMaxUnavailable | default 1 }}
+    type: RollingUpdate
+  revisionHistoryLimit: 10
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ .Chart.Name }}
+        app.kubernetes.io/part-of: {{ .Chart.Name }}
+        checksum/confd: {{ include (print .Template.BasePath "/configmap-confd.yaml") . | sha256sum | trunc 63 }}
+        checksum/conf: {{ include (print .Template.BasePath "/configmap-conf.yaml") . | sha256sum | trunc 63 }} 
+    spec:
+      terminationGracePeriodSeconds: 60
+      containers:
+      - image: "{{ .Values.image.name }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.imagePullPolicy }}
+        name: {{ .Release.Name }}
+        ports:
+        {{- range $k, $v := .Values.services }}
+        - containerPort: {{ $v.containerPort }}
+        {{- end }}
+        env:
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+          - name: POD_NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+        volumeMounts:
+          {{- if .Values.extraVolumeMounts }}
+          {{- toYaml .Values.extraVolumeMounts | nindent 12 }}
+          {{- end }}
+          {{- if .Values.ssl.enabled }}
+          - mountPath: "/etc/nginx/ssh_password_file"
+            subPath: "ssh_password_file"
+            name: conf
+          - mountPath: "/etc/nginx/certs/sample.test.io"
+            name: sample-test-io
+          {{- end }}
+          - mountPath: "/etc/nginx/conf.d/"
+            name: confd
+          - mountPath: "/etc/nginx/nginx.conf"
+            subPath: "nginx.conf"
+            name: conf
+          - mountPath: "/usr/share/nginx/html/custom_50x.html"
+            subPath: "custom_50x.html"
+            name: conf
+          - mountPath: "/usr/share/nginx/html/custom_403.html"
+            subPath: "custom_403.html"
+            name: conf
+          - mountPath: "/usr/share/nginx/html/custom_404.html"
+            subPath: "custom_404.html"
+            name: conf
+      volumes:
+      {{- if .Values.extraVolumes }}
+      {{- toYaml .Values.extraVolumes | nindent 8 }}
+      {{- end }}
+      {{- if .Values.ssl.enabled }}
+        - name: sample-test-io
+          secret:
+            defaultMode: 420
+            secretName: sample.test.io
+      {{- end }}
+        - name: conf
+          configMap: 
+            name: "{{ .Release.Name }}-conf"
+            defaultMode: 0777
+        - name: confd
+          configMap: 
+            name: "{{ .Release.Name }}-confd"
+            defaultMode: 0777
