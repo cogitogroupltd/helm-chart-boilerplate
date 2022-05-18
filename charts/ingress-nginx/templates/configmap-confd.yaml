@@ -6,8 +6,8 @@ metadata:
 data:
   healthz.conf: |
     server {
-            listen  {{ .Values.service.containerPort.http }} default_server;
-        #     listen  {{ .Values.service.containerPort.https }} default_server ssl;
+            listen  {{ (index $.Values.services 0).containerPort }} default_server;
+        #     listen  {{ (index $.Values.services 1).containerPort }} default_server ssl;
 
             location /healthz {
                access_log off;
@@ -24,14 +24,14 @@ data:
     server {
 
             {{ if .Values.ssl.enabled }}
-            listen {{ .Values.service.containerPort.https }} ssl {{ if eq .Values.LoadBalancerType "proxy_protocol" }} proxy_protocol {{ end }}; 
-            listen [::]:{{ .Values.service.containerPort.https }} ssl {{ if eq .Values.LoadBalancerType "proxy_protocol" }} proxy_protocol {{ end }};
+            listen {{ (index $.Values.services 1).containerPort }} ssl {{ if eq .Values.LoadBalancerType "proxy_protocol" }} proxy_protocol {{ end }}; 
+            listen [::]:{{ (index $.Values.services 1).containerPort }} ssl {{ if eq .Values.LoadBalancerType "proxy_protocol" }} proxy_protocol {{ end }};
 
             ssl_certificate /etc/nginx/certs/sample.test.io/tls.crt;
             ssl_certificate_key /etc/nginx/certs/sample.test.io/tls.key;
             {{ else }}
-            listen {{ .Values.service.containerPort.http }} {{ if eq .Values.LoadBalancerType "proxy_protocol" }} proxy_protocol {{ end }};
-            listen [::]:{{ .Values.service.containerPort.http }} {{ if eq .Values.LoadBalancerType "proxy_protocol" }} proxy_protocol {{ end }};
+            listen {{ (index $.Values.services 0).containerPort }} {{ if eq .Values.LoadBalancerType "proxy_protocol" }} proxy_protocol {{ end }};
+            listen [::]:{{ (index $.Values.services 0).containerPort }} {{ if eq .Values.LoadBalancerType "proxy_protocol" }} proxy_protocol {{ end }};
             {{ end }}
             root /var/www/html;
 
@@ -54,7 +54,7 @@ data:
             {{- end }}
             
             
-            server_name sample.test.io localhost;
+            server_name 127.0.0.1 sample.test.io localhost;
 
             # Add custom pages for errors
             error_page 404 /custom_404.html;
@@ -75,7 +75,8 @@ data:
             location / {
                     resolver                kube-dns.kube-system.svc.cluster.local valid=10s ipv6=off;
                     resolver_timeout        5s;
-                    proxy_set_header        Host $host;
+                    port_in_redirect        off;
+                #     proxy_set_header        Host $host;
                     proxy_set_header        X-Real-IP $remote_addr;
                     proxy_set_header        X-Forwarded-For $proxy_add_x_forwarded_for;
                     proxy_set_header        X-Forwarded-Proto $scheme;
@@ -84,7 +85,7 @@ data:
                     proxy_http_version      1.1;
                     proxy_set_header        Upgrade $http_upgrade;
                     proxy_set_header        Connection "upgrade"; 
-                    set_real_ip_from        10.1.0.0/16;
+                    set_real_ip_from        10.244.0.0/16;
                     real_ip_recursive       on;
                     set $backend            "http://sample.sample.svc.cluster.local:80";
 

@@ -7,13 +7,13 @@ PreRequisites:
 3. Reference the volume mounts in server blocks within configmap-confd.yaml
 
 
+##############################################
 Connect to your ingress-nginx
-
+##############################################
 - kubectl port-forward ds/ingress-nginx 443:443
-{{ if .Values.services }}
-{{- range $k, $v := .Values.services }}
-{{ if eq $v.type "NodePort" }}
+{{ if .Values.services }}{{- range $k, $v := .Values.services }}{{ if eq $v.type "NodePort" }}
 OR
+
 - kubectl port-forward svc/{{ $.Release.Name }}-{{ $v.name }} {{ $v.containerPort }}:{{ $v.containerPort }}
 {{ end }}
 {{ end }}
@@ -23,11 +23,10 @@ OR
 
 Connect to your ingress-nginx
 
-- kubectl port-forward ds/ingress-nginx 443:443
-{{ if .Values.services }}
-{{- range $k, $v := .Values.services }}
-{{ if eq $v.type "NodePort" }}
+- kubectl port-forward ds/ingress-nginx {{ (index $.Values.services 0).containerPort }}:{{ (index $.Values.services 0).containerPort }}
+{{ if .Values.services }}{{- range $k, $v := .Values.services }}{{ if eq $v.type "NodePort" }}
 OR
+
 - kubectl port-forward svc/{{ $.Release.Name }}-{{ $v.name }} {{ $v.containerPort }}:{{ $v.containerPort }}
 {{ end }}
 {{ end }}
