@@ -1,0 +1,34 @@
+{{ if .Values.ssl.enabled }}
+
+PreRequisites:
+
+1. Use Cert-manager to deploy certificates into the ingress' namespace.
+2. Mount certificate secrets into ingress' daemonSet.yaml configuration as volumes.
+3. Reference the volume mounts in server blocks within configmap-confd.yaml
+
+
+Connect to your ingress-nginx
+
+- kubectl port-forward ds/ingress-nginx 443:443
+{{ if .Values.services }}
+{{- range $k, $v := .Values.services }}
+{{ if eq $v.type "NodePort" }}
+OR
+- kubectl port-forward svc/{{ $.Release.Name }}-{{ $v.name }} {{ $v.containerPort }}:{{ $v.containerPort }}
+{{ end }}
+{{ end }}
+{{ end }}
+
+{{ end }}
+
+Connect to your ingress-nginx
+
+- kubectl port-forward ds/ingress-nginx 443:443
+{{ if .Values.services }}
+{{- range $k, $v := .Values.services }}
+{{ if eq $v.type "NodePort" }}
+OR
+- kubectl port-forward svc/{{ $.Release.Name }}-{{ $v.name }} {{ $v.containerPort }}:{{ $v.containerPort }}
+{{ end }}
+{{ end }}
+{{ end }}

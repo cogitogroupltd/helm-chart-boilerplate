@@ -1,0 +1,73 @@
+
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: "{{ .Release.Name }}-conf"
+  namespace: "{{ .Release.Namespace }}"
+data:
+  ssh_password_file: |
+    hello
+  nginx.conf: |
+    user  nginx;
+    worker_processes  1;
+
+    error_log  /var/log/nginx/error.log warn;
+    pid        /var/run/nginx.pid;
+
+
+    events {
+        worker_connections  1024;
+    }
+
+
+    http {
+        real_ip_header proxy_protocol;
+        include       /etc/nginx/mime.types;
+        default_type  application/octet-stream;
+
+        proxy_set_header X-Real-IP       $proxy_protocol_addr;
+        proxy_set_header X-Forwarded-For $proxy_protocol_addr;
+        log_format  main  '$proxy_protocol_addr $remote_addr - $remote_user [$time_local] "$request" '
+                          '$status $body_bytes_sent "$http_referer" '
+                          '"$http_user_agent" "$http_x_forwarded_for"';
+
+        access_log  /var/log/nginx/access.log  main;
+        {{ if .Values.ssl.enabled }}
+        ssl_password_file /etc/nginx/ssh_password_file ;
+        {{ end }}
+        sendfile        on;
+
+        types_hash_max_size 2048;
+        server_names_hash_bucket_size 256;
+        tcp_nopush on;
+        tcp_nodelay on;
+
+        gzip on;
+
+        
+        keepalive_timeout  65;
+
+        # Virtual host configs
+        include /etc/nginx/conf.d/*.conf;
+
+        # Removing Server Tags
+        server_tokens off;
+
+    }
+  #/usr/share/nginx/html/custom_50x.html
+  custom_50x.html: |
+    <h1 style='color:red'>Error 500 502 503 504, something went wrong :-(</h1>
+    <p>We seem to be having some technical difficulties. Please contact IT with this page.</p>
+    <p>Sent from {{ .Release.Namespace }}/{{ .Release.Name }} /usr/share/nginx/html/custom_50x.html</p>
+  #/usr/share/nginx/html/custom_404x.html
+  custom_404.html: |
+    <h1 style='color:red'>Error 404: Not found :-(</h1>
+    <p>I have no idea where that file is, sorry.  Are you sure you typed in the correct URL?</p>
+    <p>Sent from K8s Helm Release {{ .Release.Namespace }}/{{ .Release.Name }}.<br>config:/etc/nginx/conf.d/*.conf<br>file:/usr/share/nginx/html/custom_404.html</p>
+  custom_403.html: |
+    <html>
+    <head><title>403 Forbidden</title></head>
+    <body>
+    <center><h1>403 Forbidden</h1></center>
+    </body>
+    </html>

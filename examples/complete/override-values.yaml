@@ -1,4 +1,9 @@
-replicaCount: 1
+replicaCount: 2
+
+autoscaling:
+  enabled: true
+  targetCPUUtilizationPercentage: 80
+
 
 image: 
   repository: 1234.dkr.ecr.us-east-1.amazonaws.com/nginx
