@@ -17,15 +17,11 @@ image:
   tag: 1.17.9
   pullPolicy: IfNotPresent
 
-service:
-  # type: NodePort
-  # nodePort: 32560
-  hostPort:
-    http: 80
-    https: 443
-  containerPort:
-    http: 80
-    https: 443
+services:
+  - name: "http"
+    containerPort: 80
+  - name: "https"
+    containerPort: 443
   
 rollingUpdateMaxUnavailable: 1
 
