@@ -1,13 +1,22 @@
-# Collection of Helm charts and examples 
+# Environment agnostic Kubernetes Helm charts
 
-## Ingress-nginx controller - cloud agnostic
+Free DevOps tools to help your business grow with minimal overheads. 
+
+
+Contents: 
+
+- `common` Kubernetes Generic Helm Chart - for all of your organisation's applications
+
+- `ingress-nginx` Kubernetes Nginx ingress controller using pure Nginx for use with all your environments, local, on-premise and/or cloud
+
 
 Successfully tested on:
- - AWS EKS using NLB
- - AWS EKS using ALB
+ - AWS EKS using NLB and ALB
  - Kind [link](https://kind.sigs.k8s.io/)
  - Rancher K3s 
  - Google Kubernetes Engine (GKE)
+
+## Ingress-nginx 
 
 Features:
 - Uses purley native Nginx configuration 
@@ -18,4 +27,17 @@ Features:
 
 
 
-See [examples](./examples)
+See HostPort [example](./examples/ingress-nginx-hostport/README.md)
+See NodePort [example](./examples/ingress-nginx/README.md)
+
+
+## Common
+
+
+Example products our customers have built using our generic helm chart:
+
+- SSH bastion host running on K8s
+- ZeroTier connected K8s pods
+- Orleans ready containers
+- Nexus Docker registry
+- Tekton environment agnostic pipelines
