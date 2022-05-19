@@ -18,9 +18,9 @@ image:
   pullPolicy: IfNotPresent
 
 services:
-  - name: "http"
+  - name: "http" # name "http" binds to http listeners 
     containerPort: 80
-  - name: "https"
+  - name: "https" # name "https" binds to https listeners 
     containerPort: 443
   
 rollingUpdateMaxUnavailable: 1
