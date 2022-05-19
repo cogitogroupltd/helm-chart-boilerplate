@@ -32,6 +32,9 @@ spec:
         {{- range $k, $v := .Values.services }}
         - containerPort: {{ $v.containerPort }}
           name: {{ $v.name }}
+          {{ if eq $v.type "HostPort" }}
+          hostPort: {{ $v.hostPort }}
+          {{- end }}
         {{- end }}
         env:
           - name: POD_NAME
