@@ -1,4 +1,4 @@
-kind: ConfigMap
+ingress-nginx-confdkind: ConfigMap
 apiVersion: v1
 metadata:
   name: "{{ .Release.Name }}-confd"
@@ -6,9 +6,11 @@ metadata:
 data:
   healthz.conf: |
     server {
-            listen  {{ (index $.Values.services 0).containerPort }} default_server;
-        #     listen  {{ (index $.Values.services 1).containerPort }} default_server ssl;
-
+          {{- range $value := .Values.services }}
+          {{- if and (not (empty $value)) (eq $value.name "http" ) }}
+            listen  {{ $value.containerPort }} default_server;
+          {{- end }}
+          {{- end }}
             location /healthz {
                access_log off;
                return 200 "healthy\n";
@@ -24,14 +26,22 @@ data:
     server {
 
             {{ if .Values.ssl.enabled }}
-            listen {{ (index $.Values.services 1).containerPort }} ssl {{ if eq .Values.LoadBalancerType "proxy_protocol" }} proxy_protocol {{ end }}; 
-            listen [::]:{{ (index $.Values.services 1).containerPort }} ssl {{ if eq .Values.LoadBalancerType "proxy_protocol" }} proxy_protocol {{ end }};
-
+            {{- range $value := .Values.services }}
+            {{- if and (not (empty $value)) (eq $value.name "https" ) }}
+            listen {{ $value.containerPort }} ssl {{ if eq $.Values.LoadBalancerType "proxy_protocol" }} proxy_protocol {{ end }}; 
+            listen [::]:{{ $value.containerPort }} ssl {{ if eq $.Values.LoadBalancerType "proxy_protocol" }} proxy_protocol {{ end }};
+            {{- end }}
+            {{- end }}
+        
             ssl_certificate /etc/nginx/certs/sample.test.io/tls.crt;
             ssl_certificate_key /etc/nginx/certs/sample.test.io/tls.key;
-            {{ else }}
-            listen {{ (index $.Values.services 0).containerPort }} {{ if eq .Values.LoadBalancerType "proxy_protocol" }} proxy_protocol {{ end }};
-            listen [::]:{{ (index $.Values.services 0).containerPort }} {{ if eq .Values.LoadBalancerType "proxy_protocol" }} proxy_protocol {{ end }};
+            {{ else }} 
+            {{- range $value := .Values.services }}
+            {{- if and (not (empty $value)) (eq $value.name "http" ) }}
+            listen {{ $value.containerPort }} {{ if eq $.Values.LoadBalancerType "proxy_protocol" }} proxy_protocol {{ end }};
+            listen [::]:{{ $value.containerPort }} {{ if eq $.Values.LoadBalancerType "proxy_protocol" }} proxy_protocol {{ end }};
+            {{- end }}
+            {{- end }}
             {{ end }}
             root /var/www/html;
 
@@ -76,7 +86,7 @@ data:
                     resolver                kube-dns.kube-system.svc.cluster.local valid=10s ipv6=off;
                     resolver_timeout        5s;
                     port_in_redirect        off;
-                #     proxy_set_header        Host $host;
+                    proxy_set_header        Host $host;
                     proxy_set_header        X-Real-IP $remote_addr;
                     proxy_set_header        X-Forwarded-For $proxy_add_x_forwarded_for;
                     proxy_set_header        X-Forwarded-Proto $scheme;
@@ -89,7 +99,6 @@ data:
                     real_ip_recursive       on;
                     set $backend            "http://sample.sample.svc.cluster.local:80";
 
-                    proxy_set_header Host $host;
                     proxy_pass $backend;
             }
     }

@@ -11,11 +11,11 @@ image:
   pullPolicy: IfNotPresent
 
 services:
-  - name: "http"
+  - name: "http" # name "http" binds to http listeners 
     type: NodePort
     nodePort: 30080
     containerPort: 80
-  - name: "https"
+  - name: "https" # name "https" binds to https listeners 
     type: NodePort
     nodePort: 30443
     containerPort: 443

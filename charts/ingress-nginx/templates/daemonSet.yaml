@@ -31,6 +31,7 @@ spec:
         ports:
         {{- range $k, $v := .Values.services }}
         - containerPort: {{ $v.containerPort }}
+          name: {{ $v.name }}
         {{- end }}
         env:
           - name: POD_NAME
