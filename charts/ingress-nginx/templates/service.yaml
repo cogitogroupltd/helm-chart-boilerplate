@@ -11,7 +11,9 @@ metadata:
   {{ end }}
   namespace: {{ $.Release.Namespace }}
 spec:
+  {{ if not (eq $v.type "HostPort") }}
   type: {{ $v.type }}
+  {{ end }}
   ports:
     - name: {{ $v.name }}
       port: {{ $v.containerPort }}

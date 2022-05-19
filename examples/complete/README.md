@@ -1,5 +1,6 @@
 # Helm Chart with PV and PVC linking and initContainer
 
+See [README.md](../../charts/common/README.md) for more information
 
 Features:
 
