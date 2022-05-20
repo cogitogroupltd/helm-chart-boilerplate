@@ -51,10 +51,11 @@ securityContext: {}
   # runAsNonRoot: true
   # runAsUser: 1000
 
-service:
-  type: ClusterIP
-  port: 80
-  targetPort: 80
+services:
+  - name: http
+    type: ClusterIP
+    containerPort: 80
+    targetPort: 80
 
 # Set the default probes to the endpoints already implemented in the dotnet service chassis
 startupProbe: {}

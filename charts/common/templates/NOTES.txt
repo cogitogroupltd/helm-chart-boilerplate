@@ -1,0 +1,25 @@
+##############################################
+Connect to your application
+##############################################
+{{ if .Values.services }}{{- range $k, $v := .Values.services }}
+- kubectl port-forward -n {{ $.Release.Namespace }} deploy/{{ $.Release.Name }} {{ $v.containerPort }}:{{ $v.containerPort }}
+OR
+- kubectl port-forward -n {{ $.Release.Namespace }} svc/{{ $.Release.Name }}-{{ $v.name }} {{ $v.containerPort }}:{{ $v.containerPort }}
+{{ end }}
+{{ if .Values.services }}{{- range $k, $v := .Values.services }}{{ if eq $v.type "NodePort" }}
+OR
+
+- kubectl port-forward -n {{ $.Release.Namespace }} svc/{{ $.Release.Name }}-{{ $v.name }} {{ $v.containerPort }}:{{ $v.containerPort }}
+{{ end }}
+{{ end }}
+{{ end }}
+
+{{ end }}
+
+{{ if .Values.services }}{{- range $k, $v := .Values.services }}{{ if eq $v.type "NodePort" }}
+OR
+
+- kubectl port-forward -n {{ $.Release.Namespace }} svc/{{ $.Release.Name }}-{{ $v.name }} {{ $v.containerPort }}:{{ $v.containerPort }}
+{{ end }}
+{{ end }}
+{{ end }}

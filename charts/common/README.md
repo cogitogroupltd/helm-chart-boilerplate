@@ -14,7 +14,7 @@ ToDo:
 
 ```bash
 cd boilerplate # cd to the root 
-helm upgrade --install myrelease ./charts/common --namespace app --create-namespace --values ./charts/common/example-values.yaml
+helm upgrade --install myrelease ./charts/common --namespace app --create-namespace 
 ```
 
 Naming convention for pods is `{{ .Release.Namespace }}`-`{{ .Chart.Name }}`|`{{ .Values.nameOverride }`
