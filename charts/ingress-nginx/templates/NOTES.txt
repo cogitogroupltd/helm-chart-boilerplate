@@ -6,28 +6,18 @@ PreRequisites:
 2. Mount certificate secrets into ingress' daemonSet.yaml configuration as volumes.
 3. Reference the volume mounts in server blocks within configmap-confd.yaml
 
-
+{{ end }}
 ##############################################
 Connect to your ingress-nginx
 ##############################################
-- kubectl port-forward -n {{ .Release.Namespace }} ds/{{.Release.Name}} 443:443
-{{ if .Values.services }}{{- range $k, $v := .Values.services }}{{ if eq $v.type "NodePort" }}
+
+kubectl port-forward -n {{ .Release.Namespace }} ds/{{.Release.Name}} {{range $value := .Values.services }}{{- if and (not (empty $value)) (eq $value.name "http" ) }}{{ $value.containerPort }}{{- end }}{{- end }}:{{- range $value := .Values.services }}{{- if and (not (empty $value)) (eq $value.name "http" ) }}{{ $value.containerPort }}{{- end }}{{- end }}
+{{ if .Values.services }}
+{{- range $k, $v := .Values.services }}
+{{ if eq $v.type "NodePort" }}
 OR
 
-- kubectl port-forward svc/{{ $.Release.Name }}-{{ $v.name }} -n {{ $.Release.Namespace }} {{ $v.containerPort }}:{{ $v.containerPort }}
+kubectl port-forward -n {{ .Release.Namespace }} svc/{{ $.Release.Name }}-{{ $v.name }}  {{ $v.containerPort }}:{{ $v.containerPort }}
 {{ end }}
-{{ end }}
-{{ end }}
-
-{{ end }}
-
-Connect to your ingress-nginx
-
-- kubectl port-forward ds/{{.Release.Name}} -n {{ .Release.Namespace }} {{- range $value := .Values.services }}{{- if and (not (empty $value)) (eq $value.name "http" ) }}{{ $value.containerPort }}{{- end }}{{- end }}:{{- range $value := .Values.services }}{{- if and (not (empty $value)) (eq $value.name "http" ) }}{{ $value.containerPort }}{{- end }}{{- end }}
-{{ if .Values.services }}{{- range $k, $v := .Values.services }}{{ if eq $v.type "NodePort" }}
-OR
-
-- kubectl port-forward svc/{{ $.Release.Name }}-{{ $v.name }} -n {{ $.Release.Namespace }} {{ $v.containerPort }}:{{ $v.containerPort }}
-{{ end }}
-{{ end }}
+{{- end }}
 {{ end }}
