@@ -82,9 +82,13 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
-            - name: http
-              containerPort: {{ (index $.Values.services 0).containerPort }}
-              protocol: TCP
+          {{- range $value := .Values.services }}
+          {{- if not (empty $value) }}
+          - name: {{ $value.name }}
+            containerPort: {{ $value.containerPort }}
+            protocol: TCP
+          {{- end }}
+          {{- end }}
           env:
           {{- if .Values.env }}
           {{- if .Values.orleans.enabled }}

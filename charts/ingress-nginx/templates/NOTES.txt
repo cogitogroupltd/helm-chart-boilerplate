@@ -10,11 +10,11 @@ PreRequisites:
 ##############################################
 Connect to your ingress-nginx
 ##############################################
-- kubectl port-forward ds/ingress-nginx 443:443
+- kubectl port-forward -n {{ .Release.Namespace }} ds/{{.Release.Name}} 443:443
 {{ if .Values.services }}{{- range $k, $v := .Values.services }}{{ if eq $v.type "NodePort" }}
 OR
 
-- kubectl port-forward svc/{{ $.Release.Name }}-{{ $v.name }} {{ $v.containerPort }}:{{ $v.containerPort }}
+- kubectl port-forward svc/{{ $.Release.Name }}-{{ $v.name }} -n {{ $.Release.Namespace }} {{ $v.containerPort }}:{{ $v.containerPort }}
 {{ end }}
 {{ end }}
 {{ end }}
@@ -23,11 +23,11 @@ OR
 
 Connect to your ingress-nginx
 
-- kubectl port-forward ds/ingress-nginx {{ (index $.Values.services 0).containerPort }}:{{ (index $.Values.services 0).containerPort }}
+- kubectl port-forward ds/{{.Release.Name}} -n {{ .Release.Namespace }} {{- range $value := .Values.services }}{{- if and (not (empty $value)) (eq $value.name "http" ) }}{{ $value.containerPort }}{{- end }}{{- end }}:{{- range $value := .Values.services }}{{- if and (not (empty $value)) (eq $value.name "http" ) }}{{ $value.containerPort }}{{- end }}{{- end }}
 {{ if .Values.services }}{{- range $k, $v := .Values.services }}{{ if eq $v.type "NodePort" }}
 OR
 
-- kubectl port-forward svc/{{ $.Release.Name }}-{{ $v.name }} {{ $v.containerPort }}:{{ $v.containerPort }}
+- kubectl port-forward svc/{{ $.Release.Name }}-{{ $v.name }} -n {{ $.Release.Namespace }} {{ $v.containerPort }}:{{ $v.containerPort }}
 {{ end }}
 {{ end }}
 {{ end }}

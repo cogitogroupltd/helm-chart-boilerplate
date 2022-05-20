@@ -156,7 +156,16 @@ configMap:
           include /etc/nginx/conf.d/*.conf;
       }
 
-
+services:
+  - name: "http"
+    type: NodePort
+    nodePort: 30081
+    containerPort: 80
+  - name: "https"
+    type: NodePort
+    nodePort: 30444
+    containerPort: 443
+    
 persistence:
   enabled: true
   pvcs:

@@ -10,8 +10,8 @@ metadata:
 spec:
   type: {{ $value.type }}
   ports:
-    - name: http
-      port: {{ $value.port }}
+    - name: {{ $value.name }}
+      port: {{ $value.containerPort }}
       targetPort: {{ $value.targetPort }}
       {{ if and (eq $value.type "NodePort") ($value.nodePort)}}
       nodePort: {{ $value.nodePort }}
