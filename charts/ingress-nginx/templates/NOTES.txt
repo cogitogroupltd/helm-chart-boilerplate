@@ -11,13 +11,28 @@ PreRequisites:
 Connect to your ingress-nginx
 ##############################################
 
+1. Port-forwarding
+
 kubectl port-forward -n {{ .Release.Namespace }} ds/{{.Release.Name}} {{range $value := .Values.services }}{{- if and (not (empty $value)) (eq $value.name "http" ) }}{{ $value.containerPort }}{{- end }}{{- end }}:{{- range $value := .Values.services }}{{- if and (not (empty $value)) (eq $value.name "http" ) }}{{ $value.containerPort }}{{- end }}{{- end }}
 {{ if .Values.services }}
 {{- range $k, $v := .Values.services }}
 {{ if eq $v.type "NodePort" }}
 OR
 
-kubectl port-forward -n {{ .Release.Namespace }} svc/{{ $.Release.Name }}-{{ $v.name }}  {{ $v.containerPort }}:{{ $v.containerPort }}
+kubectl port-forward -n {{ $.Release.Namespace }} svc/{{ $.Release.Name }}-{{ $v.name }}  {{ $v.containerPort }}:{{ $v.containerPort }}
 {{ end }}
 {{- end }}
 {{ end }}
+{{$counter := 0}}
+{{ if .Values.services }}
+{{- range $k, $v := .Values.services }}
+{{$counter = add1 $counter }}
+{{ if eq $v.type "NodePort" }}
+2. NodePort ({{$counter}})
+
+curl localhost:{{ $v.nodePort }}
+{{ else if eq $v.type "HostPort"  }}
+2. HostPort
+
+curl localhost:{{ $v.HostPort }}
+{{ end }}{{ end }}{{ end }}
