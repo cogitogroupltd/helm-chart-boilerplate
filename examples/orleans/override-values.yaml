@@ -1,0 +1,35 @@
+replicaCount: 6
+
+image: 
+  repository: 12345.dkr.ecr.eu-west-2.amazonaws.com/app1
+  tag: "prd-latest"
+  pullPolicy: "Always"
+
+serviceAccount:
+  enabled: true
+  annotations:
+    eks.amazonaws.com/role-arn: "arn:aws:iam::12345:role/production-task-execution-role"
+
+services:
+ - name: main
+   type: ClusterIP
+   port: 80
+   targetPort: 3000
+   protocol: TCP
+ - name: admin
+   type: ClusterIP
+   port: 8080
+   targetPort: 3001
+   protocol: TCP
+
+
+secenv:
+  DB_PASSWORD: ${DB_PASSWORD}
+
+env:
+  AWS_REGION: "eu-west-2"
+  
+
+
+orleans:
+  enabled: true

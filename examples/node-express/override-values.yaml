@@ -8,7 +8,7 @@ image:
 serviceAccount:
   enabled: true
   annotations:
-    eks.amazonaws.com/role-arn: "arn:aws:iam::12345:role/staging-fargate-ecs-task-execution-role"
+    eks.amazonaws.com/role-arn: "arn:aws:iam::12345:role/production-execution-role"
 
 services:
  - name: main
@@ -22,17 +22,13 @@ services:
    targetPort: 3001
    protocol: TCP
 
+secenv:
+  DB_PASSWORD: override_me
 
 env:
   AWS_REGION: "eu-west-2"
-  DB_PASSWORD: ${DB_PASSWORD}
 
-persistence:
-  enabled: false
 
-configMap:
-  enabled: false
-  envFrom: false
 
 rawYaml:
   enabled: true

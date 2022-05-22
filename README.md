@@ -2,6 +2,7 @@
 
 Free DevOps tools to help your business grow with minimal overheads. 
 
+Source repository https://github.com/cogitogroupltd/boilerplate
 
 Contents: 
 
@@ -12,23 +13,28 @@ Contents:
 
 Successfully tested on:
  - AWS EKS using NLB and ALB
- - Kind [link](https://kind.sigs.k8s.io/)
+ - Kind [download](https://kind.sigs.k8s.io/)
  - Rancher K3s 
  - Google Kubernetes Engine (GKE)
 
 ## Ingress-nginx 
 
 Features:
-- Uses purley native Nginx configuration 
+- Uses pure native Nginx configuration 
+- WebSocket, SSL and TCP streaming backend support
+- Healthcheck endpoint for Kubernetes lifecycle management
+- Custom [40x.html](charts/ingress-nginx/templates/configmap-conf.yaml) and [50x](charts/ingress-nginx/templates/configmap-conf.yaml) error pages 
 - Basic username/password authentication for each proxied application
 - IP Whitelisting for each proxied application
-- Zero-downtime rollingUpdate for any cluster with 2 or more nodes
-- Cloud agnostic deployment exposing HostPort or NodePort
+- Zero-downtime upgrades using prestop hook `SIGQUIT` signal
+- Cloud agnostic deployment exposing `HostPort` or `NodePort`
 
 
+Examples:
 
-See HostPort [example](./examples/ingress-nginx-hostport/README.md)
-See NodePort [example](./examples/ingress-nginx/README.md)
+[ingress-nginx-hostport]](./examples/ingress-nginx-hostport/README.md) using HostPort 80/443
+[ingress-nginx-ssl-selfsigned](./examples/ingress-nginx-ssl-selfsigned/README.md) using SSL certificates and NodePort 30080/300443
+[ingress-nginx-tcp](./examples/ingress-nginx-tcp/README.md) using mysql TCP backend
 
 
 ## Common
@@ -37,7 +43,16 @@ See NodePort [example](./examples/ingress-nginx/README.md)
 Example products our customers have built using our generic helm chart:
 
 - SSH bastion host running on K8s
+    [README.md](./examples/sshd/README.md) for more information
+- Autoscaling backend service
+    [README.md](./examples/backend-autoscaling/README.md) for more information
+- Simple NodeJS express server with rawYaml injection
+    [README.md](./examples/node-express/README.md) for more information
 - ZeroTier connected K8s pods
+    TBC
 - Orleans ready containers
+    [README.md](./examples/orleans/README.md) for more information
 - Nexus Docker registry
+    TBC
 - Tekton environment agnostic pipelines
+    TBC
