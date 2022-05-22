@@ -3,6 +3,6 @@
 See [README.md](../../charts/common/README.md)
 
 ```bash
-cd boilerplate/examples/backend-autoscaling
+cd helm-chart-boilerplate/examples/backend-autoscaling
 helm upgrade --install myrelease ../charts/common --values ./override-values.yaml
 ```

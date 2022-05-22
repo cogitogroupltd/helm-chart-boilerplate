@@ -16,7 +16,7 @@ For example:
 2. Install ingress-nginx 
 
 ```bash
-cd boilerplate/examples/ingress-nginx-whitelisting
+cd helm-chart-boilerplate/examples/ingress-nginx-whitelisting
 helm upgrade --install ingress-nginx ../../charts/ingress-nginx --namespace default --values ./values-override.yaml
 ```
 

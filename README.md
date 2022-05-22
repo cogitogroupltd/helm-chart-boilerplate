@@ -2,7 +2,7 @@
 
 [Cogito Group's](https://cogitogroup.co.uk) cloud agnostic and generic Helm charts to help businesses securely scale with minimal DevOps overheads. 
 
-Source repository https://github.com/cogitogroupltd/boilerplate
+Source repository https://github.com/cogitogroupltd/helm-chart-boilerplate
 
 Contents: 
 

@@ -6,7 +6,7 @@ See [README.md](../../charts/ingress-nginx/README.md)
 1. Install the nginx ingress controller 
 
 ```bash
-cd boilerplate/examples/ingress-nginx-hostport
+cd helm-chart-boilerplate/examples/ingress-nginx-hostport
 helm upgrade --install ingress-nginx ../../charts/ingress-nginx-hostport --namespace default --values ./values-override.yaml
 ```
 

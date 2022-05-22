@@ -35,7 +35,7 @@ See [NOTES.txt](./templates/NOTES.txt) for more information on the prerequisites
 1. Deploy the ingress nginx controller
 
 ```bash
-cd boilerplate
+cd helm-chart-boilerplate
 helm upgrade --install ingress-nginx ./charts/ingress-nginx --values ./examples/ingress-nginx-tcp/values-override.yaml --create-namespace --namespace ingress-nginx --debug 
 ```
 
