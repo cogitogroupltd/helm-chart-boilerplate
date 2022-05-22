@@ -1,15 +1,13 @@
 # Environment agnostic Kubernetes Helm charts
 
-[Cogito Group's](https://cogitogroup.co.uk) collection of Helm charts to help businesses operate and scale with minimal DevOps overheads; zero-downtime upgrades and more. Cloud agnostic and generic
+[Cogito Group's](https://cogitogroup.co.uk) cloud agnostic and generic Helm charts to help businesses operate and scale with minimal DevOps overheads. 
 
 Source repository https://github.com/cogitogroupltd/boilerplate
 
 Contents: 
 
-- `ingress-nginx` Kubernetes Nginx ingress controller using pure Nginx for use with all your environments, local, on-premise and/or cloud
-- `common` Kubernetes Generic Helm Chart - for all of your organisation's applications
-
-
+- [ingress-nginx](./charts/ingress-nginx/README.md) Kubernetes Nginx ingress controller using pure Nginx for deploying to all environments, local, on-premise and/or cloud
+- [common](./charts/common/README.md) Kubernetes Generic Helm Chart for deploying all applications with a single parameter file using a single Helm chart
 
 ## Ingress-nginx 
 
