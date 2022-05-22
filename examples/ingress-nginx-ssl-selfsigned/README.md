@@ -31,7 +31,7 @@ Edit the content of `ssh_password_file` in [configmap-conf.yaml](charts/ingress-
 kubectl delete secret --ignore-not-found=true "${RELEASE_NAME}-certs" -n $RELEASE_NAMESPACE ; kubectl create secret generic "${RELEASE_NAME}-certs" -n $RELEASE_NAMESPACE --from-file=tls.key=./sample.key --from-file=tls.crt=./sample.crt ; 
 ```
 
-3. Install the nginx ingress controller `DaemonSet`
+3. Install the nginx ingress controller 
 
 ```bash
 cd ../ # cd boilerplate/examples/ingress-nginx-ssl-selfsigned
@@ -43,5 +43,9 @@ helm upgrade --install $RELEASE_NAME ../../charts/ingress-nginx --namespace defa
 NOTE: Namespace field must match up to value of `$backend` in [configmap-confd.yaml](charts/ingress-nginx/templates/configmap-confd.yaml) 
 
 ```bash
-kubectl apply -f sample-pod.yaml
+kubectl apply -f ../../charts/ingress-nginx/_sample-pod.yaml
 ```
+
+5. Test connectivity 
+
+See output from step 1
