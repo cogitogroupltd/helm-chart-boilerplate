@@ -23,13 +23,20 @@ spec:
         checksum/confd: {{ include (print .Template.BasePath "/configmap-confd.yaml") . | sha256sum | trunc 63 }}
         checksum/conf: {{ include (print .Template.BasePath "/configmap-conf.yaml") . | sha256sum | trunc 63 }} 
     spec:
-      terminationGracePeriodSeconds: 60
+      terminationGracePeriodSeconds: 600
       containers:
       - image: "{{ .Values.image.name }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.imagePullPolicy }}
         name: {{ .Release.Name }}
         ports:
         {{- range $k, $v := .Values.services }}
+        - containerPort: {{ $v.containerPort }}
+          name: {{ $v.name }}
+          {{ if eq $v.type "HostPort" }}
+          hostPort: {{ $v.hostPort }}
+          {{- end }}
+        {{- end }}
+        {{- range $k, $v := .Values.extraPorts }}
         - containerPort: {{ $v.containerPort }}
           name: {{ $v.name }}
           {{ if eq $v.type "HostPort" }}
@@ -70,6 +77,16 @@ spec:
           - mountPath: "/usr/share/nginx/html/custom_404.html"
             subPath: "custom_404.html"
             name: conf
+        lifecycle:
+          preStop:
+            exec:
+              command: ["/bin/sh", "-c", "sleep 5; nginx -c /etc/nginx/nginx.conf -s quit;"]
+        livenessProbe:
+{{ toYaml .Values.livenessProbe | indent 10 }}
+        readinessProbe:
+{{ toYaml .Values.readinessProbe | indent 10 }}
+        startupProbe:
+{{ toYaml .Values.startupProbe | indent 10 }}
       volumes:
       {{- if .Values.extraVolumes }}
       {{- toYaml .Values.extraVolumes | nindent 8 }}
@@ -78,7 +95,7 @@ spec:
         - name: sample-test-io
           secret:
             defaultMode: 420
-            secretName: sample.test.io
+            secretName: "{{ .Release.Name }}-certs"
       {{- end }}
         - name: conf
           configMap: 
