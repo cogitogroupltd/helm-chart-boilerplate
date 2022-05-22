@@ -22,7 +22,7 @@ kubectl create secret regcred \
 
 - Example 1 install command 
 ```bash
-cd boilerplate/examples/complete
+cd helm-chart-boilerplate/examples/complete
 helm upgrade --install myrelease ../charts/common --values ./override-values.yaml
 ```
 

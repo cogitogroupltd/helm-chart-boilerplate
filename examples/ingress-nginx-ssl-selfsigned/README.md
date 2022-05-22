@@ -34,7 +34,7 @@ kubectl delete secret --ignore-not-found=true "${RELEASE_NAME}-certs" -n $RELEAS
 3. Install the nginx ingress controller 
 
 ```bash
-cd ../ # cd boilerplate/examples/ingress-nginx-ssl-selfsigned
+cd ../ # cd helm-chart-boilerplate/examples/ingress-nginx-ssl-selfsigned
 helm upgrade --install $RELEASE_NAME ../../charts/ingress-nginx --namespace default --values ./values-override.yaml
 ```
 

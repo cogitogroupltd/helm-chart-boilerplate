@@ -13,7 +13,7 @@ ToDo:
 ## Usage
 
 ```bash
-cd boilerplate # cd to the root 
+cd helm-chart-boilerplate # cd to the root 
 helm upgrade --install myrelease ./charts/common --namespace app --create-namespace 
 ```
 
