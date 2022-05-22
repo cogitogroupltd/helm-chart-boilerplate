@@ -31,7 +31,7 @@ Successfully tested on:
 
 Examples:
 
-- [ingress-nginx-hostport]](./examples/ingress-nginx-hostport/README.md) using HostPort 80/443
+- [ingress-nginx-hostport](./examples/ingress-nginx-hostport/README.md) using HostPort 80/443
 - [ingress-nginx-ssl-selfsigned](./examples/ingress-nginx-ssl-selfsigned/README.md) using SSL certificates and NodePort 30080/300443
 - [ingress-nginx-tcp](./examples/ingress-nginx-tcp/README.md) using mysql TCP backend
 - [ingress-nginx-tcp](./examples/ingress-nginx-whitelisting/README.md) using AWS NLB and IP whitelisting
