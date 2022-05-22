@@ -24,7 +24,20 @@ services:
   - name: "https" # name "https" binds to https listeners 
     containerPort: 443
     hostPort: 443
-  
+
+# Open additional ports to ingress-nginx for raw TCP backends
+# extraPorts:
+#   - name: "mysql" 
+#     containerPort: 3306
+#     hostPort: 3306
+#   - name: "mysql" 
+#     containerPort: 3306
+#     nodePort: 300001
+
+livenessProbe: 
+readinessProbe: 
+startupProbe: 
+
 rollingUpdateMaxUnavailable: 1
 
 ssl:
