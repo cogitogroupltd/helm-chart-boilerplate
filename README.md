@@ -1,14 +1,14 @@
 # Environment agnostic Kubernetes Helm charts
 
-Colelction of DevOps tooling to help businesses scale with minimal overheads. 
+[Cogito Group's](https://cogitogroup.co.uk) Collection of helm charts to help businesses scale with minimal DevOps overheads.
 
 Source repository https://github.com/cogitogroupltd/boilerplate
 
 Contents: 
 
+- `ingress-nginx` Kubernetes Nginx ingress controller using pure Nginx for use with all your environments, local, on-premise and/or cloud
 - `common` Kubernetes Generic Helm Chart - for all of your organisation's applications
 
-- `ingress-nginx` Kubernetes Nginx ingress controller using pure Nginx for use with all your environments, local, on-premise and/or cloud
 
 
 ## Ingress-nginx 
@@ -39,6 +39,12 @@ Examples:
 
 ## Common
 
+Features:
+- Secrets mounted envVars `.Values.secenv`
+- ConfigMap mounted envVars `.Values.configenv`
+- Redis side car container `.Values.RedisSidecar`
+
+See [values.yaml](charts/common/values.yaml) for full list of features
 
 Examples:
 

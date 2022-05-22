@@ -1,3 +1,5 @@
+# See ../../charts/common/values.yaml for full list of features
+
 replicaCount: 2
 
 autoscaling:
@@ -165,7 +167,7 @@ services:
     type: NodePort
     nodePort: 30444
     containerPort: 443
-    
+
 persistence:
   enabled: true
   pvcs:

@@ -1,3 +1,5 @@
+# See ../../charts/common/values.yaml for full list of features
+
 image:
   repository: "george7522/sshd"
   tag: "alpine"
