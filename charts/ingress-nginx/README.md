@@ -49,4 +49,6 @@ kubectl port-forward ds/ingress-nginx --namespace ingress-nginx 8888:80 &
 
 ## Uninstall
 
+```bash
 helm delete ingress-nginx -n ingress-nginx
+```
