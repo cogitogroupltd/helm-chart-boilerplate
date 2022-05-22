@@ -217,11 +217,6 @@ persistence:
                   values:
                     - amd64
                     
-
-  
-
-
-
 readinessCheck:
   readinessProbe:
     tcpSocket:

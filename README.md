@@ -43,6 +43,10 @@ Features:
 - Secrets mounted envVars `.Values.secenv`
 - ConfigMap mounted envVars `.Values.configenv`
 - Redis side car container `.Values.RedisSidecar`
+- InitContainers `.Values.initContainers`
+- Helm Hooks `.Values.hook`
+- In-line file drop-ins for configMap creation `.Values.configMap.files`
+- PersistentVolume and PersistentVolumeClaim creation in-line `.Values.persistence`
 
 See [values.yaml](charts/common/values.yaml) for full list of features
 
