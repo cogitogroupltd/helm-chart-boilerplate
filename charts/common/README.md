@@ -95,5 +95,6 @@ See examples in [example-values.yaml](./charts/common/example-values.yaml) and [
 
 ## Uninstall
 
+```bash
 helm delete -n app myrelease
-
+```
