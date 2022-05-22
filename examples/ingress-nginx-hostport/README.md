@@ -1,4 +1,4 @@
-# Ingress-nginx using 80/443 HostPorts and IP whitelisting
+# Ingress-nginx using 80/443 HostPorts
 
 See [README.md](../../charts/ingress-nginx/README.md)
 
@@ -6,8 +6,8 @@ See [README.md](../../charts/ingress-nginx/README.md)
 1. Install the nginx ingress controller 
 
 ```bash
-cd boilerplate/examples/ingress-nginx-whitelisting
-helm upgrade --install ingress-nginx ../../charts/ingress-nginx-whitelisting --namespace default --values ./values-override.yaml
+cd boilerplate/examples/ingress-nginx-hostport
+helm upgrade --install ingress-nginx ../../charts/ingress-nginx-hostport --namespace default --values ./values-override.yaml
 ```
 
 2. Install Sample application hosted on https://sample.test.io
