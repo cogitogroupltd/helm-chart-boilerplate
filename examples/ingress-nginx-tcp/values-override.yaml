@@ -1,10 +1,3 @@
-
-whiteListing:
-  enabled: true
-  addresses:
-    ssh_bastion_nat_gateway: "52.1.0.233/32"
-    my_home: "73.176.177.40/32"
-
 image:
   name: nginx
   tag: 1.21.6
@@ -20,4 +13,13 @@ services:
     hostPort: 443
     containerPort: 443
 
+extraPorts:
+  - name: "mysql" # name "http" binds to http listeners 
+    type: HostPort
+    hostPort: 3306
+    containerPort: 3306
+
 rollingUpdateMaxUnavailable: 1 # 1 is the minimum available value for this field when using DaemonSet
+
+ssl:
+  enabled: false
