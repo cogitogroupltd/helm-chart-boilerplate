@@ -1,6 +1,6 @@
 # Environment agnostic Kubernetes Helm charts
 
-Free DevOps tools to help your business grow with minimal overheads. 
+Colelction of DevOps tooling to help businesses scale with minimal overheads. 
 
 Source repository https://github.com/cogitogroupltd/boilerplate
 
@@ -10,12 +10,6 @@ Contents:
 
 - `ingress-nginx` Kubernetes Nginx ingress controller using pure Nginx for use with all your environments, local, on-premise and/or cloud
 
-
-Successfully tested on:
- - AWS EKS using NLB and ALB
- - Kind [download](https://kind.sigs.k8s.io/)
- - Rancher K3s 
- - Google Kubernetes Engine (GKE)
 
 ## Ingress-nginx 
 
@@ -29,18 +23,24 @@ Features:
 - Zero-downtime upgrades using prestop hook `SIGQUIT` signal
 - Cloud agnostic deployment exposing `HostPort` or `NodePort`
 
+Successfully tested on:
+ - AWS EKS using NLB and ALB
+ - Kind [download](https://kind.sigs.k8s.io/)
+ - Rancher K3s 
+ - Google Kubernetes Engine (GKE)
 
 Examples:
 
-[ingress-nginx-hostport]](./examples/ingress-nginx-hostport/README.md) using HostPort 80/443
-[ingress-nginx-ssl-selfsigned](./examples/ingress-nginx-ssl-selfsigned/README.md) using SSL certificates and NodePort 30080/300443
-[ingress-nginx-tcp](./examples/ingress-nginx-tcp/README.md) using mysql TCP backend
+- [ingress-nginx-hostport]](./examples/ingress-nginx-hostport/README.md) using HostPort 80/443
+- [ingress-nginx-ssl-selfsigned](./examples/ingress-nginx-ssl-selfsigned/README.md) using SSL certificates and NodePort 30080/300443
+- [ingress-nginx-tcp](./examples/ingress-nginx-tcp/README.md) using mysql TCP backend
+- [ingress-nginx-tcp](./examples/ingress-nginx-whitelisting/README.md) using AWS NLB and IP whitelisting
 
 
 ## Common
 
 
-Example products our customers have built using our generic helm chart:
+Examples:
 
 - SSH bastion host running on K8s
     [README.md](./examples/sshd/README.md) for more information
