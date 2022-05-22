@@ -22,7 +22,7 @@ openssl x509 -req -sha256 -days 730 -in sample.csr -CA ca.crt -CAkey ca.key -set
 
 2. Store the encryption password in the configMap
 
-Edit the content of `ssh_password_file` in [configmap-conf.yaml](charts/ingress-nginx/templates/configmap-conf.yaml). "hello" is used as an example default.
+Edit the content of `ssh_password_file` in [configmap-conf.yaml](../../charts/ingress-nginx/templates/configmap-conf.yaml). "hello" is used as an example default.
 
 
 3. Create K8s secrets with certificates and key
@@ -40,7 +40,7 @@ helm upgrade --install $RELEASE_NAME ../../charts/ingress-nginx --namespace defa
 
 4. Install Sample application hosted on https://sample.test.io
 
-NOTE: Namespace field must match up to value of `$backend` in [configmap-confd.yaml](charts/ingress-nginx/templates/configmap-confd.yaml) 
+NOTE: Namespace field must match up to value of `$backend` in [configmap-confd.yaml](../../charts/ingress-nginx/templates/configmap-confd.yaml) 
 
 ```bash
 kubectl apply -f ../../charts/ingress-nginx/_sample-pod.yaml
