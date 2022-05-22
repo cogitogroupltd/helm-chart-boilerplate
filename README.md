@@ -21,6 +21,8 @@ Features:
 - Zero-downtime upgrades using preStop hook `SIGQUIT` signal
 - Cloud agnostic deployment exposing `HostPort` or `NodePort`
 
+See [values.yaml](./charts/ingress-nginx/values.yaml) for full list of features
+
 Successfully tested on:
  - AWS EKS using NLB and ALB
  - Kind [download](https://kind.sigs.k8s.io/)
