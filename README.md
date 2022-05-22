@@ -1,6 +1,6 @@
 # Environment agnostic Kubernetes Helm charts
 
-[Cogito Group's](https://cogitogroup.co.uk) Collection of helm charts to help businesses scale with minimal DevOps overheads.
+[Cogito Group's](https://cogitogroup.co.uk) collection of Helm charts to help businesses operate and scale with minimal DevOps overheads; zero-downtime upgrades and more. Cloud agnostic and generic
 
 Source repository https://github.com/cogitogroupltd/boilerplate
 
@@ -17,10 +17,10 @@ Features:
 - Uses pure native Nginx configuration 
 - WebSocket, SSL and TCP streaming backend support
 - Healthcheck endpoint for Kubernetes lifecycle management
-- Custom [40x.html](charts/ingress-nginx/templates/configmap-conf.yaml) and [50x](charts/ingress-nginx/templates/configmap-conf.yaml) error pages 
+- Custom [40x.html](./charts/ingress-nginx/templates/configmap-conf.yaml) and [50x](./charts/ingress-nginx/templates/configmap-conf.yaml) error pages 
 - Basic username/password authentication for each proxied application
 - IP Whitelisting for each proxied application
-- Zero-downtime upgrades using prestop hook `SIGQUIT` signal
+- Zero-downtime upgrades using preStop hook `SIGQUIT` signal
 - Cloud agnostic deployment exposing `HostPort` or `NodePort`
 
 Successfully tested on:
@@ -39,6 +39,8 @@ Examples:
 
 ## Common
 
+A generic helm chart to deploy a multitude of applications to Kubernetes using just a single input file `override-values.yaml`.
+
 Features:
 - Secrets mounted envVars `.Values.secenv`
 - ConfigMap mounted envVars `.Values.configenv`
@@ -48,7 +50,7 @@ Features:
 - In-line file drop-ins for configMap creation `.Values.configMap.files`
 - PersistentVolume and PersistentVolumeClaim creation in-line `.Values.persistence`
 
-See [values.yaml](charts/common/values.yaml) for full list of features
+See [values.yaml](./charts/common/values.yaml) for full list of features
 
 Examples:
 

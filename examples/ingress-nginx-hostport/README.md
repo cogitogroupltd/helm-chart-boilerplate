@@ -12,7 +12,7 @@ helm upgrade --install ingress-nginx ../../charts/ingress-nginx-hostport --names
 
 2. Install Sample application hosted on https://sample.test.io
 
-NOTE: Namespace field must match up to value of `$backend` in [configmap-confd.yaml](charts/ingress-nginx/templates/configmap-confd.yaml) 
+NOTE: Namespace field must match up to value of `$backend` in [configmap-confd.yaml](../../charts/ingress-nginx/templates/configmap-confd.yaml) 
 
 ```bash
 kubectl apply -f ../../charts/ingress-nginx/_sample-pod.yaml
