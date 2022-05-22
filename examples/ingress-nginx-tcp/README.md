@@ -9,7 +9,7 @@ See [README.md](../../charts/ingress-nginx/README.md)
 
 
 ```bash
-cd boilerplate/examples/ingress-nginx
+cd boilerplate/examples/ingress-nginx-tcp
 helm upgrade --install ingress-nginx ../../charts/ingress-nginx --namespace default --values ./values-override.yaml
 ```
 
