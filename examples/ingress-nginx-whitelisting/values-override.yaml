@@ -1,3 +1,4 @@
+# See ../../charts/ingress-nginx/values.yaml for full list of features
 
 whiteListing:
   enabled: true

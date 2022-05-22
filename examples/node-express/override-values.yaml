@@ -1,3 +1,5 @@
+# See ../../charts/common/values.yaml for full list of features
+
 replicaCount: 6
 
 image: 
