@@ -1,4 +1,33 @@
-# Install the chart
+# Environment agnostic ingress-nginx controller DaemonSet
+
+## Parameters
+
+See [values.yaml](./values.yaml) for examples 
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| basicAuth.enabled | bool | `false` |  |
+| basicAuth.users.admin | string | `"SomePassWord."` |  |
+| image.name | string | `"nginx"` |  |
+| image.pullPolicy | string | `"IfNotPresent"` |  |
+| image.tag | string | `"1.17.9"` |  |
+| livenessProbe | string | `nil` |  |
+| readinessProbe | string | `nil` |  |
+| rollingUpdateMaxUnavailable | int | `1` |  |
+| services[0].containerPort | int | `80` |  |
+| services[0].hostPort | int | `80` |  |
+| services[0].name | string | `"http"` |  |
+| services[1].containerPort | int | `443` |  |
+| services[1].hostPort | int | `443` |  |
+| services[1].name | string | `"https"` |  |
+| ssl.enabled | bool | `false` |  |
+| startupProbe | string | `nil` |  |
+| whitelisting.addresses.example | string | `"1.2.3.4/32"` |  |
+| whitelisting.enabled | bool | `false` |  |
+----------------------------------------------
+
+
+## Usage
 
 See [NOTES.txt](./templates/NOTES.txt) for more information on the prerequisites. 
 
