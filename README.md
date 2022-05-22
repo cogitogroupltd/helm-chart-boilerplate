@@ -1,6 +1,6 @@
 # Environment agnostic Kubernetes Helm charts
 
-[Cogito Group's](https://cogitogroup.co.uk) cloud agnostic and generic Helm charts to help businesses operate and scale with minimal DevOps overheads. 
+[Cogito Group's](https://cogitogroup.co.uk) cloud agnostic and generic Helm charts to help businesses securely scale with minimal DevOps overheads. 
 
 Source repository https://github.com/cogitogroupltd/boilerplate
 
