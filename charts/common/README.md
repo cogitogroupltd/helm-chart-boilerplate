@@ -43,14 +43,14 @@ See [values.yaml](./values.yaml) for examples
 | image.repository | string | `""` |  |
 | image.tag | string | `"latest"` |  |
 | imagePullSecrets[0].name | string | `"regcred"` |  |
-| initContainer.args | list | `[]` |  |
-| initContainer.command | list | `[]` |  |
-| initContainer.enabled | bool | `false` |  |
-| initContainer.extraVolumeMounts | list | `[]` |  |
-| initContainer.extraVolumes | list | `[]` |  |
-| initContainer.image.imagePullPolicy | string | `nil` |  |
-| initContainer.image.repository | string | `nil` |  |
-| initContainer.image.tag | string | `nil` |  |
+| initContainers.args | list | `[]` |  |
+| initContainers.command | list | `[]` |  |
+| initContainers.enabled | bool | `false` |  |
+| initContainers.extraVolumeMounts | list | `[]` |  |
+| initContainers.extraVolumes | list | `[]` |  |
+| initContainers.image.imagePullPolicy | string | `nil` |  |
+| initContainers.image.repository | string | `nil` |  |
+| initContainers.image.tag | string | `nil` |  |
 | livenessProbe | object | `{}` |  |
 | nameOverride | string | `""` |  |
 | nodeSelector."beta.kubernetes.io/arch" | string | `"amd64"` |  |
@@ -82,7 +82,6 @@ See [values.yaml](./values.yaml) for examples
 | services[0].type | string | `"ClusterIP"` |  |
 | startupProbe | object | `{}` |  |
 | tolerations | list | `[]` |  |
-| urlPath | object | `{}` |  |
 
 ----------------------------------------------
 

@@ -15,7 +15,7 @@ image:
 deploymentLabels: {}
 
 imagePullSecrets:
-- name: regcred
+# - name: regcred
 
 redisSidecar: 
   enabled: false
@@ -26,8 +26,6 @@ redisSidecar:
 
 nameOverride: ""
 fullnameOverride: ""
-
-urlPath: {}
 
 serviceAccount:
   # Specifies whether a service account should be created
@@ -116,9 +114,53 @@ hook:
 
 persistence:
   enabled: false
-  storageClassName: default
-  size: 10Gi
-  accessMode: ReadWriteMany
+  # pvcs:
+  # - name: nginx-service-logs-pvc
+  #   storageClassName: local-path
+  #   accessMode: ReadWriteMany
+  #   size: 25Gi
+  # - name: nginx-service-pvc
+  #   storageClassName: local-path
+  #   accessMode: ReadWriteMany
+  #   size: 26Gi
+    
+
+  # persistentVolumes:
+  # - name: nginx-service-logs
+  #   size: 25Gi
+  #   volumeMode: Filesystem
+  #   accessMode: ReadWriteMany
+  #   claimRef: nginx-service-logs-pvc
+  #   persistentVolumeReclaimPolicy: Retain
+  #   storageClassName: local-path
+  #   localPath: /mnt/logs
+  #   nodeAffinityRules:
+  #     nodeAffinity:
+  #       required:
+  #         nodeSelectorTerms:
+  #           - matchExpressions:
+  #               - key: kubernetes.io/arch
+  #                 operator: In
+  #                 values:
+  #                   - amd64
+  # - name: nginx-service-pv
+  #   size: 26Gi
+  #   volumeMode: Filesystem
+  #   accessMode: ReadWriteMany
+  #   claimRef: nginx-service-pvc
+  #   persistentVolumeReclaimPolicy: Retain
+  #   storageClassName: local-path
+  #   localPath: /mnt/rabbitmq_logs 
+  #   nodeAffinityRules:
+  #     nodeAffinity:
+  #       required:
+  #         nodeSelectorTerms:
+  #           - matchExpressions:
+  #               - key: kubernetes.io/arch
+  #                 operator: In
+  #                 values:
+  #                   - amd64
+                    
 
 extraVolumeMounts: []
 extraVolumes: []
@@ -147,7 +189,7 @@ configMap:
 #     secret: rds-combined-ca-bundle
 #     mountPath: /app/certs
 
-initContainer:
+initContainers:
   enabled: false
   image:
     repository: 
