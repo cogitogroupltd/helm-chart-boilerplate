@@ -81,6 +81,25 @@ spec:
           preStop:
             exec:
               command: ["/bin/sh", "-c", "sleep 5; nginx -c /etc/nginx/nginx.conf -s quit;"]
+        {{ if .Values.basicAuth.enabled }}
+          postStart:  
+            exec:
+              command:
+                - "sh"
+                - "-c"
+                - |
+                  #!/bin/bash
+                  # Install Basic Auth Password and configure htaccess  ;
+                  apt update ;
+                  apt install -y apache2-utils ;
+                  mkdir -p /etc/apache2 ;
+                  {{- range $name, $value := .Values.basicAuth.users }}
+                  {{- if not (empty $value)  }}
+                  echo {{ $value | quote }} | htpasswd -c -i /etc/apache2/.htpasswd {{ $name }} ;
+                  {{- end }}
+                  {{- end }}
+                  chown root:root /etc/apache2/.htpasswd ;
+          {{ end }}
         livenessProbe:
 {{ toYaml .Values.livenessProbe | indent 10 }}
         readinessProbe:
