@@ -1,6 +1,6 @@
 # Generated using the below command
 # $ cd helm-chart-boilerplate
-# $ helm template myrelease ./charts/ingress-nginx --namespace ingress-nginx --values ./examples/ingress-nginx-hostport/values-override.yaml --debug > output.yaml
+# $ helm template myrelease ./charts/ingress-nginx --namespace ingress-nginx --values ./examples/ingress-nginx-whitelisting/values-override.yaml --debug > output.yaml
 ---
 # Source: app/templates/service.yaml
 apiVersion: v1
