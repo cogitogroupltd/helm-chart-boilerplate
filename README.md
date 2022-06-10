@@ -22,9 +22,10 @@ Table of contents:
 * 2. [Common](#Common)
 	* 2.1. [Example - Helm Chart for SSH bastion server](#Example-HelmChartforSSHbastionserver)
 	* 2.2. [Example - Autoscaling backend service](#Example-Autoscalingbackendservice)
-	* 2.3. [Example - Simple NodeJS express server with rawYaml injection](#Example-SimpleNodeJSexpressserverwithrawYamlinjection)
-	* 2.4. [Example - Helm Chart for Orleans Kubernetes application](#Example-HelmChartforOrleansKubernetesapplication)
-	* 2.5. [Example - Tekton helm chart](#Example-Tektonhelmchart)
+	* 2.3. [Example - Complete deployment of full common features](#Example-Completedeploymentoffullcommonfeatures)
+	* 2.4. [Example - Simple NodeJS express server with rawYaml injection](#Example-SimpleNodeJSexpressserverwithrawYamlinjection)
+	* 2.5. [Example - Helm Chart for Orleans Kubernetes application](#Example-HelmChartforOrleansKubernetesapplication)
+	* 2.6. [Example - Tekton helm chart](#Example-Tektonhelmchart)
 
 <!-- vscode-markdown-toc-config
 	numbering=true
@@ -236,7 +237,7 @@ cd helm-chart-boilerplate/examples/common-backend-autoscaling
 helm upgrade --install myrelease ../charts/common --values ./override-values.yaml
 ```
 
-### Example - Complete deployment of full common features
+###  2.3. <a name='Example-Completedeploymentoffullcommonfeatures'></a>Example - Complete deployment of full common features
 
 See [README.md](../../charts/common/README.md) for more information
 
@@ -272,7 +273,7 @@ helm upgrade --install myrelease ../charts/common --values ./override-values.yam
 helm upgrade --install myrelease ../charts/common --values ./override-values.yaml --namespace app --set secenv.RABBIT_PASSWD=NadmapyefHybIdviGlyilguvminorcAu  --image.pullPolicy=Always --set "initContainers[0].env[1].value=${AWS_SECRET_ACCESS_KEY}"
 ```
 
-###  2.3. <a name='Example-SimpleNodeJSexpressserverwithrawYamlinjection'></a>Example - Simple NodeJS express server with rawYaml injection
+###  2.4. <a name='Example-SimpleNodeJSexpressserverwithrawYamlinjection'></a>Example - Simple NodeJS express server with rawYaml injection
 
 See [README.md](../../charts/common/README.md) for more information
 
@@ -282,7 +283,7 @@ export DB_PASSWORD=pass123
 helm upgrade --install node-express ../../charts/common --values ./override-values.yaml --set secenv.DB_PASSWORD=${DB_PASSWORD}
 ```
 
-###  2.4. <a name='Example-HelmChartforOrleansKubernetesapplication'></a>Example - Helm Chart for Orleans Kubernetes application
+###  2.5. <a name='Example-HelmChartforOrleansKubernetesapplication'></a>Example - Helm Chart for Orleans Kubernetes application
 
 See [README.md](../../charts/common/README.md) for more information
 
@@ -293,6 +294,6 @@ helm upgrade --install node-express ../../charts/common --values ./override-valu
 ```
 
 
-###  2.5. <a name='Example-Tektonhelmchart'></a>Example - Tekton helm chart
+###  2.6. <a name='Example-Tektonhelmchart'></a>Example - Tekton helm chart
 
 TBC
