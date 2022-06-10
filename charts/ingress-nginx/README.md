@@ -6,11 +6,12 @@ See [values.yaml](./values.yaml) for examples
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| basicAuth.enabled | bool | `false` |  |
+| basicAuth.enabled | bool | `false` | |
 | basicAuth.users.admin | string | `"SomePassWord."` |  |
+| LoadBalancerType | string | `proxy_protocol` |  |
 | image.name | string | `"nginx"` |  |
 | image.pullPolicy | string | `"IfNotPresent"` |  |
-| image.tag | string | `"1.17.9"` |  |
+| image.tag | string | `"1.22.0"` |  |
 | livenessProbe | string | `nil` |  |
 | readinessProbe | string | `nil` |  |
 | rollingUpdateMaxUnavailable | int | `1` |  |

@@ -14,7 +14,7 @@ basicAuth:
 
 image:
   name: nginx
-  tag: 1.17.9
+  tag: 1.22.0
   pullPolicy: IfNotPresent
 
 services:
@@ -33,6 +33,37 @@ services:
 #   - name: "mysql" 
 #     containerPort: 3306
 #     nodePort: 300001
+
+confd:
+  enabled: false
+  # files:
+  #   mysite.cogitogroup.co.uk.conf: 
+  #     server_name: 
+  #     backend_host:
+  #     backend_port:
+  #     extraServerProperties: |
+  #       some_header_val = 10m
+  #     extraLocationProperties: |
+        
+
+       
+confd_inline:
+  enabled: false
+  # files:
+  #   mysite.cogitogroup.co.uk.conf: | 
+  #       server {              
+  #         listen 80 ;
+  #         listen [::]:80 ;
+        
+  #         root /var/www/html;
+
+  #         server_name localhost;
+  #         location / {
+  #           root /usr/share/nginx/html;
+  #          }
+  #       }
+       
+
 
 livenessProbe: 
 readinessProbe: 

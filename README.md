@@ -9,6 +9,11 @@ Contents:
 - [ingress-nginx](./charts/ingress-nginx/README.md) Kubernetes Nginx ingress controller using pure Nginx for deploying to all environments, local, on-premise and/or cloud
 - [common](./charts/common/README.md) Kubernetes Generic Helm Chart for deploying all applications with a single parameter file using a single Helm chart
 
+
+ToDo:
+- Add flattened helm chart output to all charts using Helm template command
+- Prefix examples dirs with common
+
 ## Ingress-nginx 
 
 Features:
@@ -22,6 +27,8 @@ Features:
 - Cloud agnostic deployment exposing `HostPort` or `NodePort`
 
 See [values.yaml](./charts/ingress-nginx/values.yaml) for full list of features
+
+See `raw-yaml-output` directories for example outputted Kubernetes YAML 
 
 Successfully tested on:
  - AWS EKS using NLB and ALB

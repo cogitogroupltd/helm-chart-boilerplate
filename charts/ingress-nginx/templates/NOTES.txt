@@ -32,7 +32,7 @@ kubectl port-forward -n {{ $.Release.Namespace }} svc/{{ $.Release.Name }}-{{ $v
 
 curl localhost:{{ $v.nodePort }}
 {{ else if eq $v.type "HostPort"  }}
-2. HostPort
+2. HostPort ({{$counter}})
 
-curl localhost:{{ $v.HostPort }}
+curl localhost:{{ $v.hostPort }}
 {{ end }}{{ end }}{{ end }}

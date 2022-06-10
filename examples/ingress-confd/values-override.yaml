@@ -1,0 +1,71 @@
+# See ../../charts/ingress-nginx/values.yaml for full list of features
+LoadBalancerType: proxy_protocol
+image:
+  name: nginx
+  tag: 1.22.0
+  pullPolicy: IfNotPresent
+
+services:
+  - name: "http" # name "http" binds to http listeners 
+    type: HostPort
+    hostPort: 80
+    containerPort: 80
+  - name: "https" # name "https" binds to https listeners 
+    type: HostPort
+    hostPort: 443
+    containerPort: 443
+
+extraPorts:
+  - name: "mysql" # name "http" binds to http listeners 
+    type: HostPort
+    hostPort: 3306
+    containerPort: 3306
+
+
+confd:
+  enabled: true
+  files:
+    hello.cogitogroup.co.uk.conf: 
+      ssl_cert_dir_name: hello-cogitogroup-co-uk
+      ssl_cert_existing_secret_name: hello-cogitogroup-co-uk # contains tls.key and tls.crt 
+      server_name: hello.cogitogroup.co.uk
+      backend_host: hello.svc.cluster.local
+      backend_port: 80
+      extraServerProperties: |
+        some_server_block_property 10m
+      extraLocationPropertiesBegin: |
+        proxy_read_timeout      90;
+      extraLocationPropertiesFinal: |
+        proxy_set_header Authorization ""; # stop nginx forwarding the basic auth header for nginx .htpasswd to grafana
+    jenkins.cogitogroup.co.uk.conf: 
+      ssl_cert_dir_name: jenkins-cogitogroup-co-uk
+      ssl_cert_existing_secret_name: jenkins-cogitogroup-co-uk # contains tls.key and tls.crt 
+      server_name: jenkins.cogitogroup.co.uk
+      backend_host: jenkins.svc.cluster.local
+      backend_port: 80
+      extraServerProperties: |
+        some_server_block_property 10m
+      extraLocationPropertiesBegin: |
+        proxy_read_timeout      90;
+      extraLocationPropertiesFinal: |
+        proxy_set_header Authorization ""; # stop nginx forwarding the basic auth header for nginx .htpasswd to grafana
+
+confd_inline:
+  enabled: true
+  files:
+    mysite.cogitogroup.co.uk.conf: | 
+        server {              
+          listen 80 ;
+          listen [::]:80 ;
+        
+          root /var/www/html;
+
+          server_name localhost;
+          location / {
+            root /usr/share/nginx/html;
+           }
+        }
+rollingUpdateMaxUnavailable: 1 # 1 is the minimum available value for this field when using DaemonSet
+
+ssl:
+  enabled: true

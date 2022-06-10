@@ -2,7 +2,7 @@
 
 image:
   name: nginx
-  tag: 1.21.6
+  tag: 1.22.0
   pullPolicy: IfNotPresent
 
 livenessProbe:

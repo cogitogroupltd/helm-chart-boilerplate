@@ -62,6 +62,12 @@ spec:
             name: conf
           - mountPath: "/etc/nginx/certs/sample.test.io"
             name: sample-test-io
+          {{- if .Values.confd.enabled }}
+          {{- range $k, $v := .Values.confd.files }}
+          - mountPath: "/etc/nginx/certs/{{ $v.ssl_cert_dir_name }}"
+            name: {{ $v.ssl_cert_dir_name }}
+          {{- end }}
+          {{- end }}
           {{- end }}
           - mountPath: "/etc/nginx/conf.d/"
             name: confd
@@ -93,9 +99,10 @@ spec:
                   apt update ;
                   apt install -y apache2-utils ;
                   mkdir -p /etc/apache2 ;
+                  touch /etc/apache2/.htpasswd
                   {{- range $name, $value := .Values.basicAuth.users }}
                   {{- if not (empty $value)  }}
-                  echo {{ $value | quote }} | htpasswd -c -i /etc/apache2/.htpasswd {{ $name }} ;
+                  echo {{ $value | quote }} | htpasswd -i /etc/apache2/.htpasswd {{ $name }} ;
                   {{- end }}
                   {{- end }}
                   chown root:root /etc/apache2/.htpasswd ;
@@ -115,6 +122,14 @@ spec:
           secret:
             defaultMode: 420
             secretName: "{{ .Release.Name }}-certs"
+      {{- if .Values.confd.enabled }}
+      {{- range $k, $v := .Values.confd.files }}
+        - secret: 
+            defaultMode: 420
+            secretName: "{{ $v.ssl_cert_existing_secret_name }}"
+          name: {{ $v.ssl_cert_dir_name }}
+      {{- end }}
+      {{- end }}
       {{- end }}
         - name: conf
           configMap: 
