@@ -236,7 +236,7 @@ cd helm-chart-boilerplate/examples/common-backend-autoscaling
 helm upgrade --install myrelease ../charts/common --values ./override-values.yaml
 ```
 
-### Example - Complete deployment of full common features
+### Example - Complete deployment of full common features
 
 See [README.md](../../charts/common/README.md) for more information
 
