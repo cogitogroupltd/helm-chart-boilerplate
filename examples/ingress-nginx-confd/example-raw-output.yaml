@@ -1,0 +1,137 @@
+# Generated using the below command
+# $ cd helm-chart-boilerplate
+# $ helm template myrelease ./charts/ingress-nginx --namespace ingress-nginx --values ./examples/ingress-confd/values-override.yaml --debug > output.yaml
+---
+# Source: app/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: "myrelease-app-http"
+  namespace: default
+  labels:
+    helm.sh/chart: app-0.5.1
+    app.kubernetes.io/name: app
+    app.kubernetes.io/instance: myrelease
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: HostPort
+  ports:
+    - name: http
+      port: 80
+      targetPort: 
+      
+      protocol: 
+  selector:
+    app.kubernetes.io/name: app
+    app.kubernetes.io/instance: myrelease
+---
+# Source: app/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: "myrelease-app-https"
+  namespace: default
+  labels:
+    helm.sh/chart: app-0.5.1
+    app.kubernetes.io/name: app
+    app.kubernetes.io/instance: myrelease
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: HostPort
+  ports:
+    - name: https
+      port: 443
+      targetPort: 
+      
+      protocol: 
+  selector:
+    app.kubernetes.io/name: app
+    app.kubernetes.io/instance: myrelease
+---
+# Source: app/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myrelease-app
+  namespace: default
+  labels:
+    app: myrelease-app
+    version: "1.22.0"
+    helm.sh/chart: app-0.5.1
+    app.kubernetes.io/name: app
+    app.kubernetes.io/instance: myrelease
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: app
+      app.kubernetes.io/instance: myrelease
+  template:
+    metadata:
+      annotations:
+        co.elastic.logs.myrelease-app-service/enabled: "true"
+        checksum/config: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+      labels:
+        app: myrelease-app
+        version: "1.22.0"
+        app.kubernetes.io/name: app
+        app.kubernetes.io/instance: myrelease
+    spec:
+      serviceAccountName: default
+      securityContext:
+        {}
+      initContainers:
+        args: []
+        command: []
+        enabled: false
+        extraVolumeMounts: []
+        extraVolumes: []
+        image:
+          imagePullPolicy: null
+          repository: null
+          tag: null
+      containers:
+        - name: myrelease-app-service  
+          securityContext:
+            {}
+          image: ":1.22.0"
+          imagePullPolicy: IfNotPresent
+          ports:
+          - name: http
+            containerPort: 80
+            protocol: TCP
+          - name: https
+            containerPort: 443
+            protocol: TCP
+          env:
+          # Params for env vars populated from k8s secrets
+          resources:
+            {}
+      nodeSelector:
+        beta.kubernetes.io/arch: amd64
+        beta.kubernetes.io/os: linux
+---
+# Source: app/templates/tests/test-connection.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "myrelease-app-test-connection"
+  labels:
+    helm.sh/chart: app-0.5.1
+    app.kubernetes.io/name: app
+    app.kubernetes.io/instance: myrelease
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+    "helm.sh/hook": test
+spec:
+  containers:
+    - name: wget
+      image: busybox
+      command: ['wget']
+      args: ['myrelease-app:80']
+  restartPolicy: Never
