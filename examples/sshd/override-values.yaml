@@ -5,12 +5,13 @@ image:
   tag: "alpine"
   pullPolicy: Always
 
-service:
-  enabled: true
+services:
+- name: sshd
   type: NodePort
   nodePort: 30022
   port: 22
   targetPort: 22
+
 
 extraVolumes:
 - name: authorizedkeys

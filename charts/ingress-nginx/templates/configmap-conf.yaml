@@ -21,7 +21,9 @@ data:
 
 
     http {
+        {{ if eq .Values.LoadBalancerType "proxy_protocol" }}
         real_ip_header proxy_protocol;
+        {{ end }}
         include       /etc/nginx/mime.types;
         default_type  application/octet-stream;
 
