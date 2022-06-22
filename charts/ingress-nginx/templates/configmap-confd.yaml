@@ -42,7 +42,7 @@ data:
         {{- end }}
         {{- end }}
         {{ end }}
-        server_name    {{ $v.server_name }}:;
+        server_name    {{ $v.server_name }};
         root /var/www/html;
 
         
@@ -99,7 +99,6 @@ data:
   sample.test.io.conf: |
     # sample routing
     server {
-
             {{ if .Values.ssl.enabled }}
             {{- range $value := .Values.services }}
             {{- if and (not (empty $value)) (eq $value.name "https" ) }}
