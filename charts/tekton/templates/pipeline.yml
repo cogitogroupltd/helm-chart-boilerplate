@@ -16,6 +16,11 @@ spec:
   - name: git_repository_name
     description: The name of the git repository
     default: "git_repository_name_default_value"
+  - name: ARGS
+    type: array
+    description: Arguments to pass to kn CLI
+    default:
+      - "help"
   workspaces:
     - name: git-pvc
     - name: image-cache

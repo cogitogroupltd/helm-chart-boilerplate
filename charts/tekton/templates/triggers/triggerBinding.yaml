@@ -1,5 +1,6 @@
 {{- if .Values.pipelines }}
 {{- range $value := .Values.pipelines }}
+{{- if $value.trigger }}
 apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerBinding
 metadata:
@@ -30,5 +31,6 @@ spec:
 {{ end }}
 {{ end }}
 ---
+{{- end }}
 {{- end }}
 {{- end }}

@@ -1,0 +1,109 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: buildah-build
+spec:
+  description: >-
+    s2i-java-11 task clones a Git repository and builds and pushes a container
+    image using S2I and a Java 11 builder image.
+  params:
+    - default: .
+      description: The location of the path to run s2i from
+      name: PATH_CONTEXT
+      type: string
+    - default: 'true'
+      description: >-
+        Verify the TLS on the registry endpoint (for push/pull to a non-TLS
+        registry)
+      name: TLSVERIFY
+      type: string
+    - default: ''
+      description: Additional Maven arguments
+      name: MAVEN_ARGS_APPEND
+      type: string
+    - default: 'false'
+      description: Remove the Maven repository after the artifact is built
+      name: MAVEN_CLEAR_REPO
+      type: string
+    - default: ''
+      description: The base URL of a mirror used for retrieving artifacts
+      name: MAVEN_MIRROR_URL
+      type: string
+    - description: Location of the repo where image has to be pushed
+      name: IMAGE_NAME
+      type: string
+    - description: The tag of the image to be pushed
+      name: IMAGE_TAG
+      type: string
+      default: "latest"
+  steps:
+    - name: build
+      workingDir: $(workspaces.source.path)
+      command:
+        - buildah
+        - bud
+        - '--storage-driver=vfs'
+        - '--tls-verify=$(params.TLSVERIFY)'
+        - '--layers'
+        - '-f'
+        - /gen-source/Dockerfile
+        - '-t'
+        - $(params.IMAGE_NAME):$(params.IMAGE_TAG)
+        - '-t'
+        - $(params.IMAGE_NAME):latest
+        - .
+      image: >-
+        registry.redhat.io/rhel8/buildah@sha256:180c4d9849b6ab0e5465d30d4f3a77765cf0d852ca1cb1efb59d6e8c9f90d467
+      resources: {}
+      volumeMounts:
+        - mountPath: /var/lib/containers
+          name: varlibcontainers
+        - mountPath: /gen-source
+          name: gen-source
+      workingDir: /gen-source
+    - command:
+        - buildah
+        - push
+        - '--storage-driver=vfs'
+        - '--tls-verify=$(params.TLSVERIFY)'
+        - --digestfile
+        - $(workspaces.source.path)/image-digest
+        - $(params.IMAGE_NAME):$(params.IMAGE_TAG)
+        - 'docker://$(params.IMAGE_NAME):$(params.IMAGE_TAG)'
+      image: registry.redhat.io/rhel8/buildah@sha256:180c4d9849b6ab0e5465d30d4f3a77765cf0d852ca1cb1efb59d6e8c9f90d467
+      name: push-tag
+      resources: {}
+      volumeMounts:
+        - mountPath: /var/lib/containers
+          name: varlibcontainers
+    - command:
+        - buildah
+        - push
+        - '--storage-driver=vfs'
+        - '--tls-verify=$(params.TLSVERIFY)'
+        - --digestfile
+        - $(workspaces.source.path)/image-digest
+        - $(params.IMAGE_NAME):$(params.IMAGE_TAG)
+        - 'docker://$(params.IMAGE_NAME):latest'
+      image: registry.redhat.io/rhel8/buildah@sha256:180c4d9849b6ab0e5465d30d4f3a77765cf0d852ca1cb1efb59d6e8c9f90d467
+      name: push-latest
+      resources: {}
+      volumeMounts:
+        - mountPath: /var/lib/containers
+          name: varlibcontainers
+    - name: digest-to-results
+      image: registry.redhat.io/rhel8/buildah@sha256:180c4d9849b6ab0e5465d30d4f3a77765cf0d852ca1cb1efb59d6e8c9f90d467
+      script: cat $(workspaces.source.path)/image-digest | tee /tekton/results/IMAGE_DIGEST
+  volumes:
+    - emptyDir: {}
+      name: varlibcontainers
+    - emptyDir: {}
+      name: gen-source
+    - emptyDir: {}
+      name: envparams
+  workspaces:
+  - name: source
+    description: Holds the context and docker file
+  results:
+  - name: IMAGE_DIGEST
+    description: Digest of the image just built.

@@ -51,7 +51,7 @@ spec:
         {{ $key }}: {{ $v | quote}}
 {{- end -}}
 {{ if eq $key "default" }}
-        {{ $key }}: {{ $v | quote}}
+        {{ $key }}: {{ $v }}
 {{- end -}}
 {{- end -}}
 {{- end -}}

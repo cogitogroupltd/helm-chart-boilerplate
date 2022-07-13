@@ -1,5 +1,6 @@
 {{- if .Values.pipelines }}
 {{- range $value := .Values.pipelines }}
+{{- if $value.trigger }}
 apiVersion: triggers.tekton.dev/v1beta1
 kind: EventListener
 metadata:
@@ -13,5 +14,6 @@ spec:
     template:
       ref: {{ $value.name }}
 ---
+{{- end }}
 {{- end }}
 {{- end }}

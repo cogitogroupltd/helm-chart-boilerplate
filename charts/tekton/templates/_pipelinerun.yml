@@ -23,3 +23,11 @@ spec:
     - name: kubeconfig
       configMap:
         name: "template-pipeline-kube-config"
+    - name: image-cache
+      volumeClaimTemplate:
+        spec:
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 1Gi

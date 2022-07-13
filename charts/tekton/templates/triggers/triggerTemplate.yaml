@@ -1,5 +1,6 @@
 {{- if .Values.pipelines }}
 {{- range $value := .Values.pipelines }}
+{{- if $value.trigger }}
 apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerTemplate
 metadata:
@@ -89,5 +90,6 @@ spec:
           configMap:
             name: "{{ include "generic.fullname" $ }}-{{ $.Values.configmap_kube_conf }}"
 ---
+{{- end }}
 {{- end }}
 {{- end }}
