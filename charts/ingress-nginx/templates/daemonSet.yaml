@@ -54,7 +54,7 @@ spec:
                 fieldPath: metadata.namespace
         volumeMounts:
           {{- if .Values.extraVolumeMounts }}
-          {{- toYaml .Values.extraVolumeMounts | nindent 12 }}
+          {{- toYaml .Values.extraVolumeMounts | nindent 10 }}
           {{- end }}
           {{- if .Values.ssl.enabled }}
           - mountPath: "/etc/nginx/ssh_password_file"

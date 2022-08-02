@@ -9,7 +9,7 @@ services:
 - name: sshd
   type: NodePort
   nodePort: 30022
-  port: 22
+  containerPort: 22
   targetPort: 22
 
 

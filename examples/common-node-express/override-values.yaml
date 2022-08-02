@@ -15,12 +15,12 @@ serviceAccount:
 services:
  - name: main
    type: ClusterIP
-   port: 80
+   containerPort: 80
    targetPort: 3000
    protocol: TCP
  - name: admin
    type: ClusterIP
-   port: 8080
+   containerPort: 8080
    targetPort: 3001
    protocol: TCP
 
