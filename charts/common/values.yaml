@@ -83,8 +83,8 @@ autoscaling:
   # targetMemoryUtilizationPercentage: 80
 
 nodeSelector:
-  beta.kubernetes.io/os: linux
-  beta.kubernetes.io/arch: amd64
+  # beta.kubernetes.io/os: linux
+  # beta.kubernetes.io/arch: amd64
 
 env: []
 
@@ -190,15 +190,15 @@ configMap:
 #     mountPath: /app/certs
 
 initContainers:
-  enabled: false
-  image:
-    repository: 
-    tag: 
-    imagePullPolicy: 
-  command: []
-  args: []
-  extraVolumes: []
-  extraVolumeMounts: []
+  # enabled: false
+  # image:
+  #   repository: 
+  #   tag: 
+  #   imagePullPolicy: 
+  # command: []
+  # args: []
+  # extraVolumes: []
+  # extraVolumeMounts: []
 
 
 # Orleans requires environment configurations
