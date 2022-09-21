@@ -93,7 +93,14 @@ See output from step 1
 
 See [example-raw-output.yaml](./examples/ingress-nginx-ssl-selfsigned/example-raw-output.yaml) for example files outputted by helm templating.
 
-1. Create self-signed certificate files
+1. Create Kind cluster
+
+```bash
+cd helm-chart-boilerplate/examples/ingress-nginx-ssl-selfsigned
+kind create cluster --name kind --config cluster.yaml
+```
+
+2. Create self-signed certificate files
 
 ```bash
 
@@ -108,25 +115,25 @@ openssl req -new -newkey rsa:4096 -keyout sample.key -out sample.csr -subj '/CN=
 openssl x509 -req -sha256 -days 730 -in sample.csr -CA ca.crt -CAkey ca.key -set_serial 01 -out sample.crt 
 ```
 
-2. Store the encryption password in the configMap
+3. Store the encryption password in the configMap
 
 Edit the content of `ssh_password_file` in [configmap-conf.yaml](../../charts/ingress-nginx/templates/configmap-conf.yaml). "hello" is used as an example default.
 
 
-3. Create K8s secrets with certificates and key
+4. Create K8s secrets with certificates and key
 
 ```bash
 kubectl delete secret --ignore-not-found=true "ingress-nginx-certs" -n default ; kubectl create secret generic "ingress-nginx-certs" -n default --from-file=tls.key=./sample.key --from-file=tls.crt=./sample.crt ; 
 ```
 
-3. Install the nginx ingress controller 
+5. Install the nginx ingress controller 
 
 ```bash
 cd helm-chart-boilerplate/examples/ingress-nginx-ssl-selfsigned
 helm upgrade --install ingress-nginx ../../charts/ingress-nginx --namespace default --values ./values-override.yaml
 ```
 
-4. Install Sample application hosted on https://sample.test.io
+6. Install Sample application hosted on https://sample.test.io
 
 NOTE: Namespace field must match up to value of `$backend` in [configmap-confd.yaml](../../charts/ingress-nginx/templates/configmap-confd.yaml) 
 
@@ -134,7 +141,7 @@ NOTE: Namespace field must match up to value of `$backend` in [configmap-confd.y
 kubectl apply -f ../../charts/ingress-nginx/_sample-pod.yaml
 ```
 
-5. Test connectivity 
+7. Test connectivity 
 
 See output from step 3
 
