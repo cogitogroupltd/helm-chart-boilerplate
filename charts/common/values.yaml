@@ -169,7 +169,6 @@ extraVolumes: []
 configMap:
   enabled: false
   envFrom: false
-
 # configMap:
 #   enabled: true
 #   name: nginx-conf
@@ -181,6 +180,17 @@ configMap:
 #       events {
 #           worker_connections  1024;
 #       }
+
+# Inline option to mount a file into a secret
+secret:
+  enabled: false
+# secret:
+#   enabled: true
+#   name: settings.yaml
+#   files: 
+#     settings.yaml: |
+#       DEVICE_AUTHENTICATION_SERVICE_DATABASE_URI: "postgresql://developer:developer@some.url.io:5432/db"
+
 
 
 # Reference an existing secret and create corresponding VolumeMounts and Volumes 
