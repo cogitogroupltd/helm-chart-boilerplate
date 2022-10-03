@@ -60,8 +60,6 @@ spec:
           - mountPath: "/etc/nginx/ssh_password_file"
             subPath: "ssh_password_file"
             name: conf
-          - mountPath: "/etc/nginx/certs/sample.test.io"
-            name: sample-test-io
           {{- if .Values.confd.enabled }}
           {{- range $k, $v := .Values.confd.files }}
           - mountPath: "/etc/nginx/certs/{{ $v.ssl_cert_dir_name }}"
@@ -118,10 +116,6 @@ spec:
       {{- toYaml .Values.extraVolumes | nindent 8 }}
       {{- end }}
       {{- if .Values.ssl.enabled }}
-        - name: sample-test-io
-          secret:
-            defaultMode: 420
-            secretName: "{{ .Release.Name }}-certs"
       {{- if .Values.confd.enabled }}
       {{- range $k, $v := .Values.confd.files }}
         - secret: 
