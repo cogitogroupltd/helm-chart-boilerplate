@@ -5,7 +5,7 @@ metadata:
   name: "{{ .Release.Name }}-conf"
   namespace: "{{ .Release.Namespace }}"
 data:
-  ssh_password_file: |
+  ssh_password_file: <
     hello
   nginx.conf: |
     user  nginx;
@@ -18,7 +18,12 @@ data:
     events {
         worker_connections  1024;
     }
-
+    {{- if .Values.streams }}
+    {{- range $key, $value := .Values.streams }}
+    {{ $value | indent 4 }}
+    {{ "" | indent 0 }}
+    {{- end -}}
+    {{- end -}}
 
     http {
         {{ if eq .Values.LoadBalancerType "proxy_protocol" }}
