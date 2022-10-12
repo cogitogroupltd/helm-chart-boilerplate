@@ -25,7 +25,8 @@ Table of contents:
 	* 2.3. [Example - Complete deployment of full common features](#Example-Completedeploymentoffullcommonfeatures)
 	* 2.4. [Example - Simple NodeJS express server with rawYaml injection](#Example-SimpleNodeJSexpressserverwithrawYamlinjection)
 	* 2.5. [Example - Helm Chart for Orleans Kubernetes application](#Example-HelmChartforOrleansKubernetesapplication)
-	* 2.6. [Example - Tekton helm chart](#Example-Tektonhelmchart)
+	* 2.6. [2.6 Example - Simple Nginx with static file mounts](#Example-SimpleNginxwithstaticfilemounts)
+	* 2.7. [Example - Tekton helm chart](#Example-Tektonhelmchart)
 
 <!-- vscode-markdown-toc-config
 	numbering=true
@@ -303,13 +304,14 @@ export DB_PASSWORD=pass123
 helm upgrade --install node-express ./charts/common --values ./examples/common-orleans//override-values.yaml --set secenv.DB_PASSWORD=${DB_PASSWORD}
 ```
 
-### 2.6 Example - Simple Nginx with static file mounts
+###  2.6. <a name='Example-SimpleNginxwithstaticfilemounts'></a>2.6 Example - Simple Nginx with static file mounts
 
 
 ```bash
+cd helm-chart-boilerplate
 helm upgrade --install common-nginx ./charts/common --values ./examples/common-nginx-static/values-override.yaml
 ```
 
-###  2.6. <a name='Example-Tektonhelmchart'></a>Example - Tekton helm chart
+###  2.7. <a name='Example-Tektonhelmchart'></a>Example - Tekton helm chart
 
 TBC
