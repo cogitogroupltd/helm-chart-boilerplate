@@ -14,17 +14,17 @@ spec:
   {{ if not (eq $v.type "HostPort") }}
   type: {{ $v.type }}
   {{ end }}
-  ports:
-    - name: {{ $v.name }}
-      port: {{ $v.containerPort }}
-      targetPort: {{ $v.containerPort }}
-      {{ if or (eq $v.type "LoadBalancer") (eq $v.type "NodePort" ) }} {{ if or (eq $v.type "NodePort") ($v.nodePort)}}
-      nodePort: {{ $v.nodePort }}
-      {{ end }}
-      protocol: TCP
   selector:
     app.kubernetes.io/name: {{ $.Chart.Name }}
     app.kubernetes.io/part-of: {{ $.Chart.Name }}
+  ports:
+  - name: {{ $v.name }}
+    port: {{ $v.containerPort }}
+    targetPort: {{ $v.containerPort }}
+    {{ if or (eq $v.type "LoadBalancer") (eq $v.type "NodePort" ) }} {{ if or (eq $v.type "NodePort") ($v.nodePort)}}
+    nodePort: {{ $v.nodePort }}
+    {{ end }}
+    protocol: TCP
 {{ end }}
 {{ end }}
 ---
