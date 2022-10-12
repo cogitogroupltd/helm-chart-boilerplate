@@ -62,8 +62,8 @@ Successfully tested on:
 See [example-raw-output.yaml](./examples/ingress-nginx-confd/example-raw-output.yaml) for example files outputted by helm templating.
 
 ```bash
-cd helm-chart-boilerplate/examples/ingress-nginx-confd
-helm upgrade --install ingress-nginx ../../charts/ingress-nginx --namespace default --values ./values-override.yaml
+cd helm-chart-boilerplate
+helm upgrade --install ingress-nginx ./charts/ingress-nginx --namespace default --values ./examples/ingress-nginx-confd/values-override.yaml
 ```
 
 ###  1.2. <a name='Example-Ingress-nginxusing80443HostPorts'></a>Example - Ingress-nginx using 80/443 HostPorts
@@ -72,8 +72,8 @@ helm upgrade --install ingress-nginx ../../charts/ingress-nginx --namespace defa
 1. Install the nginx ingress controller 
 
 ```bash
-cd helm-chart-boilerplate/examples/ingress-nginx-hostport
-helm upgrade --install ingress-nginx ../../charts/ingress-nginx --namespace default --values ./values-override.yaml
+cd helm-chart-boilerplate
+helm upgrade --install ingress-nginx ./charts/ingress-nginx --namespace default --values ./examples/ingress-nginx-hostport/values-override.yaml
 ```
 
 2. Install Sample application hosted on https://sample.test.io
@@ -81,7 +81,7 @@ helm upgrade --install ingress-nginx ../../charts/ingress-nginx --namespace defa
 NOTE: Namespace field must match up to value of `$backend` in [configmap-confd.yaml](../../charts/ingress-nginx/templates/configmap-confd.yaml) 
 
 ```bash
-kubectl apply -f ../../charts/ingress-nginx/_sample-pod.yaml
+kubectl apply -f ./charts/ingress-nginx/_sample-pod.yaml
 ```
 
 3. Test connectivity 
@@ -96,8 +96,8 @@ See [example-raw-output.yaml](./examples/ingress-nginx-ssl-selfsigned/example-ra
 1. Create Kind cluster
 
 ```bash
-cd helm-chart-boilerplate/examples/ingress-nginx-ssl-selfsigned
-kind create cluster --name kind --config cluster.yaml
+cd helm-chart-boilerplate
+kind create cluster --name kind --config ./examples/ingress-nginx-ssl-selfsigned/cluster.yaml
 ```
 
 2. Create self-signed certificate files
@@ -117,28 +117,29 @@ openssl x509 -req -sha256 -days 730 -in sample.csr -CA ca.crt -CAkey ca.key -set
 
 3. Store the encryption password in the configMap
 
-Edit the content of `ssh_password_file` in [configmap-conf.yaml](../../charts/ingress-nginx/templates/configmap-conf.yaml). "hello" is used as an example default.
+Edit the content of `ssh_password_file` in [configmap-conf.yaml](./charts/ingress-nginx/templates/configmap-conf.yaml). "hello" is used as an example default.
 
 
 4. Create K8s secrets with certificates and key
 
 ```bash
-kubectl delete secret --ignore-not-found=true "ingress-nginx-certs" -n default ; kubectl create secret generic "ingress-nginx-certs" -n default --from-file=tls.key=./sample.key --from-file=tls.crt=./sample.crt ; 
+cd helm-chart-boilerplate
+kubectl delete secret --ignore-not-found=true "ingress-nginx-certs" -n default ; kubectl create secret generic "ingress-nginx-certs" -n default --from-file=tls.key=./examples/ingress-nginx-ssl-selfsigned/sample.key --from-file=tls.crt=./examples/ingress-nginx-ssl-selfsigned/sample.crt ; 
 ```
 
 5. Install the nginx ingress controller 
 
 ```bash
-cd helm-chart-boilerplate/examples/ingress-nginx-ssl-selfsigned
-helm upgrade --install ingress-nginx ../../charts/ingress-nginx --namespace default --values ./values-override.yaml
+cd helm-chart-boilerplate
+helm upgrade --install ingress-nginx ./charts/ingress-nginx --namespace default --values ./examples/ingress-nginx-ssl-selfsigned/values-override.yaml
 ```
 
 6. Install Sample application hosted on https://sample.test.io
 
-NOTE: Namespace field must match up to value of `$backend` in [configmap-confd.yaml](../../charts/ingress-nginx/templates/configmap-confd.yaml) 
+NOTE: Namespace field must match up to value of `$backend` in [configmap-confd.yaml](./charts/ingress-nginx/templates/configmap-confd.yaml) 
 
 ```bash
-kubectl apply -f ../../charts/ingress-nginx/_sample-pod.yaml
+kubectl apply -f ./charts/ingress-nginx/_sample-pod.yaml
 ```
 
 7. Test connectivity 
@@ -150,21 +151,21 @@ See output from step 3
 
 See [example-raw-output.yaml](./examples/ingress-nginx-tcp/example-raw-output.yaml) for example files outputted by helm templating.
 
-1. Create a new `mysql.conf` file with TCP listener in [configmap-confd.yaml](../../charts/ingress-nginx/templates/configmap-confd.yaml)
+1. Create a new `mysql.conf` file with TCP listener in [configmap-confd.yaml](./charts/ingress-nginx/templates/configmap-confd.yaml)
 
 
 2. Install the nginx ingress controller 
 
 
 ```bash
-cd helm-chart-boilerplate/examples/ingress-nginx-tcp
-helm upgrade --install ingress-nginx ../../charts/ingress-nginx --namespace default --values ./values-override.yaml
+cd helm-chart-boilerplate
+helm upgrade --install ingress-nginx ./charts/ingress-nginx --namespace default --values ./examples/ingress-nginx-tcp/values-override.yaml
 ```
 
 
 3. Install Sample application hosted on https://sample.test.io
 
-NOTE: Namespace field must match up to value of `$backend` in [configmap-confd.yaml](../../charts/ingress-nginx/templates/configmap-confd.yaml) 
+NOTE: Namespace field must match up to value of `$backend` in [configmap-confd.yaml](./charts/ingress-nginx/templates/configmap-confd.yaml) 
 
 ```bash
 kubectl apply -f ../../charts/ingress-nginx/_sample-pod.yaml
@@ -191,13 +192,13 @@ For example:
 2. Install ingress-nginx 
 
 ```bash
-cd helm-chart-boilerplate/examples/ingress-nginx-whitelisting
-helm upgrade --install ingress-nginx ../../charts/ingress-nginx --namespace default --values ./values-override.yaml
+cd helm-chart-boilerplate
+helm upgrade --install ingress-nginx ./charts/ingress-nginx --namespace default --values ./examples/ingress-nginx-whitelisting/values-override.yaml
 ```
 
 3. Install Sample application hosted on https://sample.test.io
 
-NOTE: Namespace field must match up to value of `$backend` in [configmap-confd.yaml](../../charts/ingress-nginx/templates/configmap-confd.yaml) 
+NOTE: Namespace field must match up to value of `$backend` in [configmap-confd.yaml](./charts/ingress-nginx/templates/configmap-confd.yaml) 
 
 ```bash
 kubectl apply -f ../../charts/ingress-nginx/_sample-pod.yaml
@@ -214,39 +215,41 @@ See output from step 2
 A generic helm chart to deploy a multitude of applications to Kubernetes using just a single input file `override-values.yaml`.
 
 Features:
-- Secrets mounted envVars `.Values.secenv`
-- ConfigMap mounted envVars `.Values.configenv`
+- Secrets mounted environment variables `.Values.secenv`
+- Secrets mounted in-line `.Values.secret.files`
+- ConfigMap mounted environment variables `.Values.configenv`
+- ConfigMap mounted in-line `.Values.configMap.files`
+- Services specified in-line `.Values.services`
 - Redis side car container `.Values.RedisSidecar`
 - InitContainers `.Values.initContainers`
 - Helm Hooks `.Values.hook`
-- In-line file drop-ins for configMap creation `.Values.configMap.files`
 - PersistentVolume and PersistentVolumeClaim creation in-line `.Values.persistence`
 
 See [values.yaml](./charts/common/values.yaml) for full list of features
 
 ###  2.1. <a name='Example-HelmChartforSSHbastionserver'></a>Example - Helm Chart for SSH bastion server 
 
-See [README.md](../../charts/common/README.md) for more information
+See [README.md](./charts/common/README.md) for more information
 
 ```bash
-cd helm-chart-boilerplate/examples/common-sshd-bastion
-helm upgrade --install sshd ../../charts/common --values ./override-values.yaml
+cd helm-chart-boilerplate
+helm upgrade --install sshd ./charts/common --values ./examples/common-sshd-bastion/override-values.yaml
 ```
 
 
 
 ###  2.2. <a name='Example-Autoscalingbackendservice'></a>Example - Autoscaling backend service
 
-See [README.md](../../charts/common/README.md) for more information
+See [README.md](./charts/common/README.md) for more information
 
 ```bash
-cd helm-chart-boilerplate/examples/common-backend-autoscaling
-helm upgrade --install myrelease ../charts/common --values ./override-values.yaml
+cd helm-chart-boilerplate
+helm upgrade --install myrelease ./charts/common --values ./examples/common-backend-autoscaling/override-values.yaml
 ```
 
 ###  2.3. <a name='Example-Completedeploymentoffullcommonfeatures'></a>Example - Complete deployment of full common features
 
-See [README.md](../../charts/common/README.md) for more information
+See [README.md](./charts/common/README.md) for more information
 
 Features:
 
@@ -268,8 +271,8 @@ kubectl create secret regcred \
 
 - Example 1 install command 
 ```bash
-cd helm-chart-boilerplate/examples/common-complete
-helm upgrade --install myrelease ../charts/common --values ./override-values.yaml
+cd helm-chart-boilerplate
+helm upgrade --install myrelease ./charts/common --values ./examples/common-complete/override-values.yaml
 ```
 
 - Example 2 install command 
@@ -277,29 +280,35 @@ helm upgrade --install myrelease ../charts/common --values ./override-values.yam
 ```bash
  export AWS_SECRET_ACCESS_KEY # AWS credential for initContainer s3 copy job
  export RABBIT_PASSWD=
-helm upgrade --install myrelease ../charts/common --values ./override-values.yaml --namespace app --set secenv.RABBIT_PASSWD=NadmapyefHybIdviGlyilguvminorcAu  --image.pullPolicy=Always --set "initContainers[0].env[1].value=${AWS_SECRET_ACCESS_KEY}"
+helm upgrade --install myrelease ./charts/common --values ./override-values.yaml --namespace app --set secenv.RABBIT_PASSWD=NadmapyefHybIdviGlyilguvminorcAu  --image.pullPolicy=Always --set "initContainers[0].env[1].value=${AWS_SECRET_ACCESS_KEY}"
 ```
 
 ###  2.4. <a name='Example-SimpleNodeJSexpressserverwithrawYamlinjection'></a>Example - Simple NodeJS express server with rawYaml injection
 
-See [README.md](../../charts/common/README.md) for more information
+See [README.md](./charts/common/README.md) for more information
 
 ```bash
-cd helm-chart-boilerplate/examples/common-node-express
+cd helm-chart-boilerplate
 export DB_PASSWORD=pass123
-helm upgrade --install node-express ../../charts/common --values ./override-values.yaml --set secenv.DB_PASSWORD=${DB_PASSWORD}
+helm upgrade --install node-express ./charts/common --values ./examples/common-node-express/override-values.yaml --set secenv.DB_PASSWORD=${DB_PASSWORD}
 ```
 
 ###  2.5. <a name='Example-HelmChartforOrleansKubernetesapplication'></a>Example - Helm Chart for Orleans Kubernetes application
 
-See [README.md](../../charts/common/README.md) for more information
+See [README.md](./charts/common/README.md) for more information
 
 ```bash
-cd helm-chart-boilerplate/examples/common-orleans
+cd helm-chart-boilerplate
 export DB_PASSWORD=pass123
-helm upgrade --install node-express ../../charts/common --values ./override-values.yaml --set secenv.DB_PASSWORD=${DB_PASSWORD}
+helm upgrade --install node-express ./charts/common --values ./examples/common-orleans//override-values.yaml --set secenv.DB_PASSWORD=${DB_PASSWORD}
 ```
 
+### 2.6 Example - Simple Nginx with static file mounts
+
+
+```bash
+helm upgrade --install common-nginx ./charts/common --values ./examples/common-nginx-static/values-override.yaml
+```
 
 ###  2.6. <a name='Example-Tektonhelmchart'></a>Example - Tekton helm chart
 

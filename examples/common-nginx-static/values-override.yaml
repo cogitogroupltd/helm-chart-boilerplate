@@ -1,0 +1,34 @@
+# See ../../charts/common/values.yaml for full list of features
+image:
+  repository: nginx
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  - name: http
+    type: ClusterIP
+    containerPort: 80
+
+extraVolumes:
+- name: html
+  configMap:
+    name: common-nginx-html
+extraVolumeMounts:
+- name: html
+  mountPath: /usr/share/nginx/html/index.html
+  subPath: index.html
+      
+configMap:
+  enabled: true
+  name: common-nginx-html
+  files: 
+    index.html: |
+      <!DOCTYPE html>
+      <html>
+          <head>
+              <title>Example</title>
+          </head>
+          <body>
+              <p>This is an example of a simple HTML page with one paragraph.</p>
+          </body>
+      </html>
