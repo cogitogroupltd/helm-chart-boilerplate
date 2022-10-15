@@ -11,6 +11,9 @@ metadata:
   {{ end }}
   namespace: {{ $.Release.Namespace }}
 spec:
+  selector:
+    app.kubernetes.io/name: {{ $.Chart.Name }}
+    app.kubernetes.io/part-of: {{ $.Chart.Name }}
   {{ if not (eq $v.type "HostPort") }}
   type: {{ $v.type }}
   {{ end }}
@@ -22,9 +25,6 @@ spec:
       nodePort: {{ $v.nodePort }}
       {{ end }}
       protocol: TCP
-  selector:
-    app.kubernetes.io/name: {{ $.Chart.Name }}
-    app.kubernetes.io/part-of: {{ $.Chart.Name }}
 {{ end }}
 {{ end }}
 ---
