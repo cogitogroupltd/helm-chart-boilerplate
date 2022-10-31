@@ -4,8 +4,6 @@
 
 Source repository https://github.com/cogitogroupltd/helm-chart-boilerplate
 
-Contents: 
-
 - [ingress-nginx](./charts/ingress-nginx/README.md) Kubernetes Nginx ingress controller using pure Nginx for deploying to all environments, local, on-premise and/or cloud
 - [common](./charts/common/README.md) Kubernetes Generic Helm Chart for deploying all applications with a single parameter file using a single Helm chart
 
@@ -25,7 +23,7 @@ Table of contents:
 	* 2.3. [Example - Complete deployment of full common features](#Example-Completedeploymentoffullcommonfeatures)
 	* 2.4. [Example - Simple NodeJS express server with rawYaml injection](#Example-SimpleNodeJSexpressserverwithrawYamlinjection)
 	* 2.5. [Example - Helm Chart for Orleans Kubernetes application](#Example-HelmChartforOrleansKubernetesapplication)
-	* 2.6. [2.6 Example - Simple Nginx with static file mounts](#Example-SimpleNginxwithstaticfilemounts)
+	* 2.6. [Example - Simple Nginx with static file mounts](#Example-SimpleNginxwithstaticfilemounts)
 	* 2.7. [Example - Tekton helm chart](#Example-Tektonhelmchart)
 
 <!-- vscode-markdown-toc-config
@@ -304,7 +302,7 @@ export DB_PASSWORD=pass123
 helm upgrade --install node-express ./charts/common --values ./examples/common-orleans//override-values.yaml --set secenv.DB_PASSWORD=${DB_PASSWORD}
 ```
 
-###  2.6. <a name='Example-SimpleNginxwithstaticfilemounts'></a>2.6 Example - Simple Nginx with static file mounts
+###  2.6. <a name='Example-SimpleNginxwithstaticfilemounts'></a>Example - Simple Nginx with static file mounts
 
 
 ```bash
