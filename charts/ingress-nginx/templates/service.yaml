@@ -11,7 +11,7 @@ metadata:
   {{ end }}
   namespace: {{ $.Release.Namespace }}
   annotations:
-  {{ with $value.annotations }}
+  {{ with $v.annotations }}
   {{ . | toYaml | nindent 4}}
   {{ end }}
 spec:
