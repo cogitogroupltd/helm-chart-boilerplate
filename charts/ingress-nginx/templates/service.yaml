@@ -10,12 +10,19 @@ metadata:
   name: {{ $.Release.Name }}
   {{ end }}
   namespace: {{ $.Release.Namespace }}
+  annotations:
+  {{ with $value.annotations }}
+  {{ . | toYaml | nindent 4}}
+  {{ end }}
 spec:
   selector:
     app.kubernetes.io/name: {{ $.Chart.Name }}
     app.kubernetes.io/part-of: {{ $.Chart.Name }}
   {{ if not (eq $v.type "HostPort") }}
   type: {{ $v.type }}
+  {{ end }}
+  {{ if $value.loadBalancerIP }}
+  loadBalancerIP: {{ $value.loadBalancerIP }}
   {{ end }}
   ports:
     - name: {{ $v.name }}
