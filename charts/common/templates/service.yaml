@@ -7,6 +7,12 @@ metadata:
   namespace: {{ $.Release.Namespace }}
   labels:
     {{- include "generic.labels" $ | nindent 4 }}
+  annotations:
+{{ if $value.annotations }}
+{{ with $value.annotations }}
+{{ .| toYaml | indent 4}}
+{{ end }}
+{{ end }}
 spec:
   type: {{ $value.type }}
   ports:
