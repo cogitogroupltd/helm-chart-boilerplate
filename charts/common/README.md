@@ -89,8 +89,8 @@ See [values.yaml](./values.yaml) for examples
 
 ## Documentation 
 
-See comments in [values.yaml](./values.yaml)
-See examples in [example-values.yaml](./charts/common/example-values.yaml) and [example-values2.yaml](./charts/common/example-values2.yaml)
+See comments in [values.yaml](./values.yaml) for full list of features and some examples
+See examples in [README.md](../../README.md)
 
 ## Uninstall
 
