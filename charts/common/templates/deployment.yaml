@@ -5,7 +5,7 @@ metadata:
   namespace: {{ .Release.Namespace }}
   labels:
     app: {{ include "generic.fullname" . }}
-    version: "{{ .Values.image.tag | default .Chart.AppVersion }}"
+    version: "{{ substr 0 12  .Values.image.tag | default .Chart.AppVersion }}"
     {{- include "generic.labels" . | nindent 4 }}
     {{- with .Values.deploymentLabels }}
     {{- toYaml . | nindent 4 }}
@@ -33,7 +33,7 @@ spec:
       {{- end }}
       labels:
         app: {{ include "generic.fullname" . }}
-        version: "{{ .Values.image.tag | default .Chart.AppVersion }}"
+        version: "{{ substr 0 12  .Values.image.tag | default .Chart.AppVersion }}"
         {{- include "generic.selectorLabels" . | nindent 8 }}
     spec:
       {{- with .Values.hostAliases }}

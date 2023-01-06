@@ -15,10 +15,18 @@ spec:
     name: {{ $value.claimRef }}
   persistentVolumeReclaimPolicy: {{ $value.reclaimPolicy }}
   storageClassName: {{ $value.storageClassName }}
+  {{- if $value.localPath }}
   local:
     path: {{ $value.localPath }}
+  {{- end }}
   {{- with $value.nodeAffinityRules}}
   {{- toYaml . | nindent 2 }}
+  {{- end }}
+  {{- if $value.csi }}
+  csi:
+  {{- with $value.csi}}
+  {{- toYaml . | nindent 4 }}
+  {{- end }}
   {{- end }}
 ---
 {{ end }}
