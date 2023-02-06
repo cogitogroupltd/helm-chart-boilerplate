@@ -4,23 +4,6 @@ metadata:
   name: "{{ .Release.Name }}-confd"
   namespace: "{{ .Release.Namespace }}"
 data:
-  healthz.conf: |
-    server {
-          {{- range $value := .Values.services }}
-          {{- if and (not (empty $value)) (eq $value.name "http" ) }}
-            listen  {{ $value.containerPort }} default_server;
-          {{- end }}
-          {{- end }}
-            location /healthz {
-               access_log off;
-               return 200 "healthy\n";
-            }
-        
-            # Redirect to https
-            location / {
-              return 301 https://$host$request_uri;
-            }
-        }
 {{ if .Values.confd.enabled }}
 {{- range $k, $v := .Values.confd.files }}
 {{ $k | indent 2}}: |
@@ -32,7 +15,7 @@ data:
         listen [::]:{{ $value.containerPort }} ssl {{ if eq $.Values.LoadBalancerType "proxy_protocol" }} proxy_protocol {{ end }};
         {{- end }}
         {{- end }}
-        ssl_certificate /etc/nginx/certs/{{ $v.ssl_ssl_cert_dir_name }}/tls.crt;
+        ssl_certificate /etc/nginx/certs/{{ $v.ssl_cert_dir_name }}/tls.crt;
         ssl_certificate_key /etc/nginx/certs/{{ $v.cert_dir_name }}/tls.key;
         {{ else }} 
         {{- range $value := $.Values.services }}
