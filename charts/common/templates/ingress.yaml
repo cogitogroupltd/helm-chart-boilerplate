@@ -1,0 +1,22 @@
+{{- if .Values.ingress.enabled }}
+{{- range $key, $value := .Values.ingress.resources }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  
+  name: {{ $key }}
+  
+  namespace: {{ $.Release.Namespace }}
+  labels:
+    {{- include "generic.labels" $ | nindent 4 }}
+  annotations:
+    {{ with $value.annotations }} 
+    {{ . | toYaml | nindent 4 }}
+    {{ end }}
+spec:
+{{ with $value.spec }} 
+{{ . | toYaml | nindent 2 }}
+{{ end }}
+---
+{{ end }}
+{{ end }}

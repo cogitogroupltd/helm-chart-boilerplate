@@ -1,0 +1,20 @@
+{{- if .Values.virtualservice.enabled }}
+{{- range $value := .Values.virtualservice.resources }}
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: {{ $key }}
+  namespace: {{ $.Release.Namespace }}
+  labels:
+    {{- include "generic.labels" $ | nindent 4 }}
+  annotations:
+    {{ with $value.annotations }} 
+    {{ . | toYaml | nindent 4 }}
+    {{ end }}
+spec:
+{{ with $value.spec }} 
+{{ . | toYaml | nindent 2 }}
+{{ end }}
+---
+{{ end }}
+{{ end }}
