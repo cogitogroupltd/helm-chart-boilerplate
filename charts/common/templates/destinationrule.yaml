@@ -1,0 +1,15 @@
+{{- if .Values.DestinationRule.enabled }}
+{{- range $key, $value := .Values.DestinationRule.resources }}
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: {{ $key }}
+  namespace: {{ $value.namespace }}
+spec:
+{{ with $value.spec }} 
+{{ . | toYaml | nindent 2 }}
+{{ end }}
+---
+{{ end }}
+{{ end }}
+  

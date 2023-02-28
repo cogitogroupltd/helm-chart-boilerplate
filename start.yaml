@@ -1,0 +1,425 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: graph-gateway
+  annotations:
+    project: tuo
+    type: api-service
+  labels:
+    app: gapi
+data:
+  TUO_CONFIG_HASH_KEY: 05fb811dbb18a852ac54b70b10950b6789a1c6585d9506d967362ef3a1de71f3
+  NODE_ENV: development
+  PORT: '4000'
+  NEW_RELIC_ENABLED: 'true'
+  NEW_RELIC_APP_NAME: gapi.graph-gateway.dev
+  NEW_RELIC_NO_CONFIG_FILE: 'true'
+  NEW_RELIC_DISTRIBUTED_TRACING_ENABLED: 'true'
+  CUSTOMER_ENVIRONMENT: dev
+  AWS_REGION: ap-southeast-2
+  REGION: ap-southeast-2
+---
+apiVersion: external-secrets.io/v1alpha1
+kind: ExternalSecret
+metadata:
+  name: graph-gateway-ssm
+  annotations:
+    project: tuo
+    type: api-service
+spec:
+  refreshInterval: 5m0s
+  secretStoreRef:
+    name: systemmanager
+    kind: ClusterSecretStore
+  target:
+    name: graph-gateway-ssm
+  data:
+    - secretKey: NEW_RELIC_LICENSE_KEY
+      remoteRef:
+        key: /myqld/shared/k8s/newrelic/license_key
+    - secretKey: TUO_RUNTIME_CATEGORY
+      remoteRef:
+        key: /myqld/shared/k8s/runtime_category
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: ing-graph-gateway-graph-gateway
+  labels:
+    app.kubernetes.io/part-of: gapi
+    app: gapi
+    version: 1.0.0
+    app.kubernetes.io/name: graph-gateway
+    myqld/service-type: ingress
+spec:
+  type: NodePort
+  selector:
+    app.kubernetes.io/part-of: gapi
+    app.kubernetes.io/name: graph-gateway
+  ports:
+    - name: http-4000
+      port: 4000
+      protocol: TCP
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: ing-graph-gateway-graph-gateway-auth
+  labels:
+    app.kubernetes.io/part-of: gapi
+    app: gapi
+    version: 1.0.0
+    app.kubernetes.io/name: graph-gateway
+    myqld/service-type: ingress
+spec:
+  type: NodePort
+  selector:
+    app.kubernetes.io/part-of: gapi
+    app.kubernetes.io/name: graph-gateway
+  ports:
+    - name: http-4000
+      port: 4000
+      protocol: TCP
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: graph-gateway
+  labels:
+    app.kubernetes.io/part-of: gapi
+    app: gapi
+    version: 1.0.0
+    app.kubernetes.io/name: graph-gateway
+    myqld/service-type: container
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/part-of: gapi
+    app.kubernetes.io/name: graph-gateway
+  ports:
+    - name: http-4000
+      port: 4000
+      protocol: TCP
+---
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: graph-gateway-graph-gateway-gapi-istio-mtls
+  namespace: sc-gapi
+spec:
+  host: ing-graph-gateway-graph-gateway.sc-gapi.svc.cluster.local
+  trafficPolicy:
+    tls:
+      mode: ISTIO_MUTUAL
+---
+kind: Ingress
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: ist-graph-gateway-graph-gateway-ext-gapi
+  namespace: istio-ingress
+  annotations:
+    alb.ingress.kubernetes.io/backend-protocol: HTTPS
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS":443}]'
+    alb.ingress.kubernetes.io/load-balancer-attributes: routing.http.drop_invalid_header_fields.enabled=true
+    alb.ingress.kubernetes.io/ssl-policy: ELBSecurityPolicy-TLS-1-2-Ext-2018-06
+    alb.ingress.kubernetes.io/ssl-redirect: '443'
+    alb.ingress.kubernetes.io/target-group-attributes: stickiness.enabled=true,stickiness.lb_cookie.duration_seconds=120
+    alb.ingress.kubernetes.io/target-type: instance
+    alb.ingress.kubernetes.io/actions.ssl-redirect: >-
+      {"Type": "redirect", "RedirectConfig": { "Protocol": "HTTPS", "Port":
+      "443", "StatusCode": "HTTP_301"}}
+    alb.ingress.kubernetes.io/healthcheck-protocol: HTTP
+    alb.ingress.kubernetes.io/healthcheck-port: status-port
+    alb.ingress.kubernetes.io/healthcheck-path: /healthz/ready
+    kubernetes.io/ingress.class: alb
+    external-dns.alpha.kubernetes.io/ingress-hostname-source: annotation-only
+    alb.ingress.kubernetes.io/group.name: ist-gapi-ext-dev-green
+    external-dns.alpha.kubernetes.io/hostname: graph-gateway-gapi.green.dev.k8s.tuo.hpw.local
+    alb.ingress.kubernetes.io/scheme: internal
+    alb.ingress.kubernetes.io/certificate-arn: >-
+      arn:aws:acm:ap-southeast-2:048181539776:certificate/0d17e0af-8304-4639-bc8c-e594fda27bff
+spec:
+  rules:
+    - host: www.dev.graph.qld.gov.au
+      http:
+        paths:
+          - path: /*
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: gateway
+                port:
+                  number: 443
+    - host: graph-gateway-gapi.green.dev.k8s.tuo.hpw.local
+      http:
+        paths:
+          - path: /*
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: gateway
+                port:
+                  number: 443
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: graph-gateway-graph-gateway-gapi-ext
+  namespace: sc-gapi
+spec:
+  hosts:
+    - www.dev.graph.qld.gov.au
+  gateways:
+    - istio-ingress/application-ingress-gateway
+  http:
+    - match:
+        - uri:
+            prefix: /
+      route:
+        - destination:
+            host: ing-graph-gateway-graph-gateway.sc-gapi.svc.cluster.local
+            port:
+              number: 4000
+  tls:
+    - match:
+        - sniHosts:
+            - www.dev.graph.qld.gov.au
+      route:
+        - destination:
+            host: ing-graph-gateway-graph-gateway.sc-gapi.svc.cluster.local
+            port:
+              number: 4000
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: graph-gateway-graph-gateway-gapi-internal
+  namespace: sc-gapi
+spec:
+  hosts:
+    - graph-gateway-gapi.green.dev.k8s.tuo.hpw.local
+  gateways:
+    - istio-ingress/application-ingress-gateway
+  http:
+    - match:
+        - uri:
+            prefix: /
+      route:
+        - destination:
+            host: ing-graph-gateway-graph-gateway.sc-gapi.svc.cluster.local
+            port:
+              number: 4000
+  tls:
+    - match:
+        - sniHosts:
+            - graph-gateway-gapi.green.dev.k8s.tuo.hpw.local
+      route:
+        - destination:
+            host: ing-graph-gateway-graph-gateway.sc-gapi.svc.cluster.local
+            port:
+              number: 4000
+---
+kind: Ingress
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: ist-graph-gateway-graph-gateway-cluster-gapi
+  namespace: istio-ingress
+  annotations:
+    alb.ingress.kubernetes.io/backend-protocol: HTTPS
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS":443}]'
+    alb.ingress.kubernetes.io/load-balancer-attributes: routing.http.drop_invalid_header_fields.enabled=true
+    alb.ingress.kubernetes.io/ssl-policy: ELBSecurityPolicy-TLS-1-2-Ext-2018-06
+    alb.ingress.kubernetes.io/ssl-redirect: '443'
+    alb.ingress.kubernetes.io/target-group-attributes: stickiness.enabled=true,stickiness.lb_cookie.duration_seconds=120
+    alb.ingress.kubernetes.io/target-type: instance
+    alb.ingress.kubernetes.io/actions.ssl-redirect: >-
+      {"Type": "redirect", "RedirectConfig": { "Protocol": "HTTPS", "Port":
+      "443", "StatusCode": "HTTP_301"}}
+    alb.ingress.kubernetes.io/healthcheck-protocol: HTTP
+    alb.ingress.kubernetes.io/healthcheck-port: status-port
+    alb.ingress.kubernetes.io/healthcheck-path: /healthz/ready
+    kubernetes.io/ingress.class: alb
+    external-dns.alpha.kubernetes.io/ingress-hostname-source: annotation-only
+    alb.ingress.kubernetes.io/group.name: ist-gapi-cluster-dev-green
+    external-dns.alpha.kubernetes.io/hostname: gapi.green.dev.myqld.developer.qld.gov.au
+    alb.ingress.kubernetes.io/scheme: internet-facing
+spec:
+  rules:
+    - host: gapi.green.dev.myqld.developer.qld.gov.au
+      http:
+        paths:
+          - path: /*
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: gateway
+                port:
+                  number: 443
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: graph-gateway-graph-gateway-gapi-cluster
+  namespace: sc-gapi
+spec:
+  hosts:
+    - gapi.green.dev.myqld.developer.qld.gov.au
+  gateways:
+    - istio-ingress/application-ingress-gateway
+  http:
+    - match:
+        - uri:
+            prefix: /
+      route:
+        - destination:
+            host: ing-graph-gateway-graph-gateway.sc-gapi.svc.cluster.local
+            port:
+              number: 4000
+  tls:
+    - match:
+        - sniHosts:
+            - gapi.green.dev.myqld.developer.qld.gov.au
+      route:
+        - destination:
+            host: ing-graph-gateway-graph-gateway.sc-gapi.svc.cluster.local
+            port:
+              number: 4000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/managed-by: myqld-service-catalog
+    app.kubernetes.io/part-of: gapi
+    app: gapi
+    version: 1.0.0
+  annotations:
+    myqld.io/environment: dev-green
+    keel.sh/policy: minor
+    keel.sh/match-tag: 'true'
+    keel.sh/trigger: poll
+    keel.sh/pollSchedule: '@every 1m'
+    project: tuo
+    type: api-service
+  name: graph-gateway
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/part-of: gapi
+      app.kubernetes.io/name: graph-gateway
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/part-of: gapi
+        app.kubernetes.io/name: graph-gateway
+        app: gapi
+        version: 1.0.0
+      annotations:
+        project: tuo
+        type: api-service
+        myqld.chde.local/config-graph-gateway-checksum: 05fb811dbb18a852ac54b70b10950b6789a1c6585d9506d967362ef3a1de71f3
+        sidecar.istio.io/rewriteAppHTTPProbers: 'false'
+    spec:
+      containers:
+        - name: graph-gateway
+          image: >-
+            docker.devops.myqld.developer.qld.gov.au/gapi/graph-gateway:5.92.0-dev
+          ports:
+            - protocol: TCP
+              containerPort: 4000
+              name: http-4000
+          envFrom:
+            - configMapRef:
+                name: graph-gateway
+          env:
+            - name: NEW_RELIC_LICENSE_KEY
+              valueFrom:
+                secretKeyRef:
+                  key: NEW_RELIC_LICENSE_KEY
+                  name: graph-gateway-ssm
+            - name: TUO_RUNTIME_CATEGORY
+              valueFrom:
+                secretKeyRef:
+                  key: TUO_RUNTIME_CATEGORY
+                  name: graph-gateway-ssm
+          resources:
+            requests:
+              cpu: '0.5'
+              memory: 256Mi
+            limits:
+              cpu: '2'
+              memory: 4096Mi
+          livenessProbe:
+            httpGet:
+              path: /.well-known/apollo/server-health
+              port: 4000
+            periodSeconds: 5
+            initialDelaySeconds: 15
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /graphql?query=%7B__typename%7D
+              port: 4000
+            periodSeconds: 5
+            initialDelaySeconds: 10
+            failureThreshold: 3
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app.kubernetes.io/name
+                    operator: In
+                    values:
+                      - graph-gateway
+                  - key: app.kubernetes.io/part-of
+                    operator: In
+                    values:
+                      - gapi
+              topologyKey: kubernetes.io/hostname
+      imagePullSecrets:
+        - name: nexus-docker
+      serviceAccount: myqld-gapi
+  revisionHistoryLimit: 1
+  strategy:
+    type: RollingUpdate
+---
+apiVersion: autoscaling/v2beta2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: graph-gateway
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: graph-gateway
+  minReplicas: 2
+  maxReplicas: 6
+  metrics:
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 90
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 90
+  behavior:
+    scaleUp:
+      policies:
+        - type: Pods
+          value: 1
+          periodSeconds: 180
+      selectPolicy: Max
+      stabilizationWindowSeconds: 30
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      selectPolicy: Min
+      policies:
+        - type: Pods
+          value: 1
+          periodSeconds: 300
