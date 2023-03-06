@@ -6,15 +6,16 @@ metadata:
   name: "{{ $value.name }}"
   namespace: {{ $.Release.Namespace }}
   labels:
+{{ if $value.labels }}
+    {{- with $value.labels -}}
+    {{- .| toYaml | indent 4 -}}
+    {{ end }}
+{{ else }}
     {{- include "generic.labels" $ | nindent 4 }}
-    {{ if $value.labels }}
-    {{ with $value.labels }}
-    {{ .| toYaml | indent 4}}
-    {{ end }}
-    {{ end }}
+{{ end }}
   annotations:
     {{ with $value.annotations }}
-    {{ .| toYaml | indent 4}}
+    {{- .| toYaml | indent 4}}
     {{ end }}
 spec:
   type: {{ $value.type }}
