@@ -69,6 +69,10 @@ spec:
           - configMapRef:
               name: {{ include "generic.fullname" . }}-configmap
         {{- end }}  
+        {{- if and .Values.configMap.envFrom .Values.configMap.enabled}}
+          - configMapRef:
+              name: {{ include "generic.fullname" . }}-configmap
+        {{- end }}  
         {{- if .Values.secenv }}
           - secretRef:
               name: {{ include "generic.fullname" . }}-secenv
