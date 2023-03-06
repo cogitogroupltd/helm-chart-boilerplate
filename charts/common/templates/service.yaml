@@ -3,28 +3,33 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: "{{ include "generic.fullname" $ }}-{{ $value.name }}"
+  name: "{{ $value.name }}"
   namespace: {{ $.Release.Namespace }}
   labels:
-    {{- include "generic.labels" $ | nindent 4 }}
+    {{ if $value.labels2 }}
+    {{ with $value.labels2 }}
+    {{ .| toYaml | indent 4}}
+    {{ end }}
+    {{ end }}
   annotations:
-{{ if $value.annotations }}
-{{ with $value.annotations }}
-{{ .| toYaml | indent 4}}
-{{ end }}
-{{ end }}
+    {{ with $value.annotations }}
+    {{ .| toYaml | indent 4}}
+    {{ end }}
 spec:
   type: {{ $value.type }}
   ports:
-    - name: {{ $value.name }}
+    - name: {{ $value.portName }}
       port: {{ $value.containerPort }}
+      {{ if $value.targetPort }}
       targetPort: {{ $value.targetPort }}
+      {{ end }}    
       {{ if and (eq $value.type "NodePort") ($value.nodePort)}}
       nodePort: {{ $value.nodePort }}
       {{ end }}
       protocol: {{ $value.protocol }}
-  selector:
-    {{- include "generic.selectorLabels" $ | nindent 4 }}
+  selector: 
+    {{- range $value := $value.selectorLabels }}
+    {{ end }}  
 ---
 {{- end }}
 {{- end }}

@@ -1,29 +1,37 @@
-{{- if .Values.autoscaling.enabled }}
-apiVersion: autoscaling/v2
+{{- if .Values.hpa.enabled }}
+{{- range $key, $value := .Values.hpa.resources }}
+apiVersion: autoscaling/v2beta2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: {{ include "generic.fullname" . }}
-  namespace: {{ .Release.Namespace }}
-  labels:
-    {{- include "generic.labels" . | nindent 4 }}
+  name: {{ $key }}
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: {{ include "generic.fullname" . }}
-  minReplicas: {{ .Values.autoscaling.minReplicas }}
-  maxReplicas: {{ .Values.autoscaling.maxReplicas }}
+    name: {{ $key }}
+  minReplicas: {{ $value.minReplicas }}
+  maxReplicas: {{ $value.maxReplicas }}
   metrics:
-    {{- if .Values.autoscaling.targetCPUUtilizationPercentage }}
+    {{- if $value.targetCPU }}
     - type: Resource
       resource:
         name: cpu
-        targetAverageUtilization: {{ .Values.autoscaling.targetCPUUtilizationPercentage }}
+        target:
+          type: Utilization
+          averageUtilization: {{ $value.targetCPU }}
     {{- end }}
-    {{- if .Values.autoscaling.targetMemoryUtilizationPercentage }}
+    {{- if $value.targetMemory }}
     - type: Resource
       resource:
         name: memory
-        targetAverageUtilization: {{ .Values.autoscaling.targetMemoryUtilizationPercentage }}
+        target:
+          type: Utilization
+          averageUtilization: {{ $value.targetMemory }}
     {{- end }}
+  behavior:
+    {{ with $value.behavior }} 
+    {{ . | toYaml | nindent 8 }}
+    {{ end }}
+---
 {{- end }}
+{{ end }}
