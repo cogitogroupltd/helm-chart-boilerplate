@@ -6,8 +6,9 @@ metadata:
   name: "{{ $value.name }}"
   namespace: {{ $.Release.Namespace }}
   labels:
-    {{ if $value.labels2 }}
-    {{ with $value.labels2 }}
+    {{- include "generic.labels" $ | nindent 4 }}
+    {{ if $value.labels }}
+    {{ with $value.labels }}
     {{ .| toYaml | indent 4}}
     {{ end }}
     {{ end }}
