@@ -6,6 +6,7 @@
 
 replicaCount: 1
 
+
 image:
   repository: ""
   pullPolicy: Always
@@ -13,6 +14,9 @@ image:
   tag: "latest"
 
 deploymentLabels: {}
+
+stdin: false
+tty: false
 
 imagePullSecrets:
 # - name: regcred

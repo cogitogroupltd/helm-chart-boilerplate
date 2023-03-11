@@ -69,10 +69,10 @@ spec:
           - secretRef:
               name: {{ include "generic.fullname" . }}-secenv
         {{- end }}  
-        {{- if .Values.tty }}
+        {{- if eq .Values.tty "true" }}
           tty: true
         {{- end }}
-        {{- if .Values.stdin }}
+        {{- if eq .Values.stdin "true" }}
           stdin: true
         {{- end }}
           securityContext:
