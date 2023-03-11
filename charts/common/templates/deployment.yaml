@@ -69,6 +69,12 @@ spec:
           - secretRef:
               name: {{ include "generic.fullname" . }}-secenv
         {{- end }}  
+        {{- if .Values.tty }}
+          tty: true
+        {{- end }}
+        {{- if .Values.stdin }}
+          stdin: true
+        {{- end }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           {{- with .Values.command }}
