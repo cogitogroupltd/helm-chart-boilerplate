@@ -15,8 +15,8 @@ image:
 
 deploymentLabels: {}
 
-stdin: false
-tty: false
+stdin: "false"
+tty: "false"
 
 imagePullSecrets:
 # - name: regcred
