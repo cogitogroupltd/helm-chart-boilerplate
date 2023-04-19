@@ -24,6 +24,10 @@ spec:
         checksum/conf: {{ include (print .Template.BasePath "/configmap-conf.yaml") . | sha256sum | trunc 63 }} 
     spec:
       terminationGracePeriodSeconds: 600
+      initContainers:
+      {{- with .Values.initContainers }}
+      {{- toYaml . | nindent 8 }}
+      {{- end }}
       containers:
       - image: "{{ .Values.image.name }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.imagePullPolicy }}

@@ -48,17 +48,36 @@ data:
         server_names_hash_bucket_size 256;
         tcp_nopush on;
         tcp_nodelay on;
+        #tcp_nopush     on;
 
-        gzip on;
-
-        
         keepalive_timeout  65;
+
+        # security, reveal less information about ourselves
+        server_tokens off; # disables emitting nginx version in error messages and in the “Server” response header field
+        more_clear_headers 'Server';
+        more_clear_headers 'X-Powered-By';
+
+        # prevent clickjacking attacks
+        more_set_headers 'X-Frame-Options: SAMEORIGIN';
+
+        # help to prevent cross-site scripting exploits
+        more_set_headers 'X-XSS-Protection: 1; mode=block';
+
+        # help to prevent Cross-Site Scripting (XSS) and data injection attacks
+        # https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP
+        more_set_headers "Content-Security-Policy: object-src 'none'; frame-ancestors 'self'; form-action 'self'; block-all-mixed-content; sandbox allow-forms allow-same-origin allow-scripts allow-popups allow-downloads; base-uri 'self';";
+
+        # enable response compression
+        gzip  on;
+        brotli on;
+        brotli_static on;
+        
 
         # Virtual host configs
         include /etc/nginx/conf.d/*.conf;
 
         # Removing Server Tags
-        server_tokens off;
+
 
     }
   #/usr/share/nginx/html/custom_50x.html
