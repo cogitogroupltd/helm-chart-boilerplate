@@ -1,0 +1,283 @@
+---
+# Source: app/templates/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "ssh-app-authorizedkeys"
+  labels:
+    helm.sh/chart: app-0.5.1
+    app.kubernetes.io/name: app
+    app.kubernetes.io/instance: sshd
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+data:
+  authorized_keys: |-
+    ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDAXNrSLoyqah7CVLd4uQV+6TwiZ19rmyyKW4muDt3w4Ka804uRaTO3hNd3fJAoAvA7QN1WiAGzJt401GOMz4txwO/DzAbR4X4ZQWtgx5C7iTFwKqhEtCORaxKICzIFGOAdBgBdvUXRdwUuZJseT7Bwg/OKkx1idyIm8oJIy03EfafNycfzY3su5zYNyLRUoyzJQiR9bfqhPTjPvKJawPwiN0ClO5mihK3C5vZ4FlwSQUYxvlWYbAKlDMX3KDB27sb9GLesYaI0GhhZUP+Bj8fmrn86iQwFOpWjgRFPDYla2Mr0cGZcwqlvlhfJoWt+WeXEq4w3K7yoGgaVvWHEr+RiwKGDcZ7LxTAP9lfMrjDmFz31+DlRKh4t3E/5NFS8QBGNt1o948PYYQpa+dXzlMfS8nyfz7KsyzGNv/zK7LxLao91Ix5w74n1lGPCTcVeRFXj45vQ//80iLOuXN/jeCtwS4ETVxUH4OZ+AtAGOa6M5eMMFRaGqFie3ZOGbSrUK+Hm1ucgQ7CesdeDqOCmmOKaXrdpD8JnzafDFyu994XtUL6OVKZJH7eHDy/+rwd1HpMFTGff2dRiO71VgK3/d0Yx0TleYwFFLzdvNSymWO35PTYi8otlYfE7muPxqb3vgzm3r4ryQ28LUIlYR/ANN1zUjmUdh1unuyZJNZnhquQGdQ== example
+    
+
+  sshd_config: |-
+    #       $OpenBSD: sshd_config,v 1.100 2016/08/15 12:32:04 naddy Exp $
+    
+    # This is the sshd server system-wide configuration file.  See
+    # sshd_config(5) for more information.
+    
+    # This sshd was compiled with PATH=/usr/local/bin:/usr/bin
+    
+    # The strategy used for options in the default sshd_config shipped with
+    # OpenSSH is to specify options with their default value where
+    # possible, but leave them commented.  Uncommented options override the
+    # default value.
+    
+    # If you want to change the port on a SELinux system, you have to tell
+    # SELinux about this change.
+    # semanage port -a -t ssh_port_t -p tcp #PORTNUMBER
+    #
+    Port 30802
+    #AddressFamily any
+    ListenAddress 0.0.0.0
+    #ListenAddress ::
+    
+    HostKey /etc/ssh/ssh_host_rsa_key
+    #HostKey /etc/ssh/ssh_host_dsa_key
+    HostKey /etc/ssh/ssh_host_ecdsa_key
+    HostKey /etc/ssh/ssh_host_ed25519_key
+    
+    # Ciphers and keying
+    #RekeyLimit default none
+    
+    # Logging
+    #SyslogFacility AUTH
+    SyslogFacility AUTHPRIV
+    #LogLevel INFO
+    
+    # Authentication:
+    
+    #LoginGraceTime 2m
+    PermitRootLogin yes
+    #StrictModes yes
+    #MaxAuthTries 6
+    #MaxSessions 10
+    
+    #PubkeyAuthentication yes
+    
+    # The default is to check both .ssh/authorized_keys and .ssh/authorized_keys2
+    # but this is overridden so installations will only check .ssh/authorized_keys
+    AuthorizedKeysFile      .ssh/authorized_keys
+    
+    #AuthorizedPrincipalsFile none
+    
+    #AuthorizedKeysCommand none
+    #AuthorizedKeysCommandUser nobody
+    
+    # For this to work you will also need host keys in /etc/ssh/ssh_known_hosts
+    #HostbasedAuthentication no
+    # Change to yes if you don't trust ~/.ssh/known_hosts for
+    # HostbasedAuthentication
+    #IgnoreUserKnownHosts no
+    # Don't read the user's ~/.rhosts and ~/.shosts files
+    #IgnoreRhosts yes
+    
+    # To disable tunneled clear text passwords, change to no here!
+    #PasswordAuthentication no
+    #PermitEmptyPasswords no
+    PasswordAuthentication no
+    
+    # Change to no to disable s/key passwords
+    #ChallengeResponseAuthentication yes
+    ChallengeResponseAuthentication no
+    
+    # Kerberos options
+    #KerberosAuthentication no
+    #KerberosOrLocalPasswd yes
+    #KerberosTicketCleanup yes
+    #KerberosGetAFSToken no
+    #KerberosUseKuserok yes
+    
+    # GSSAPI options
+    
+    
+    #GSSAPIStrictAcceptorCheck yes
+    #GSSAPIKeyExchange no
+    #GSSAPIEnablek5users no
+    
+    # Set this to 'yes' to enable PAM authentication, account processing,
+    # and session processing. If this is enabled, PAM authentication will
+    # be allowed through the ChallengeResponseAuthentication and
+    # PasswordAuthentication.  Depending on your PAM configuration,
+    # PAM authentication via ChallengeResponseAuthentication may bypass
+    # the setting of "PermitRootLogin without-password".
+    # If you just want the PAM account and session checks to run without
+    # PAM authentication, then enable this but set PasswordAuthentication
+    # and ChallengeResponseAuthentication to 'no'.
+    # WARNING: 'UsePAM no' is not supported in Red Hat Enterprise Linux and may cause several
+    # problems.
+    
+    
+    #AllowAgentForwarding yes
+    #AllowTcpForwarding yes
+    #GatewayPorts no
+    X11Forwarding yes
+    #X11DisplayOffset 10
+    #X11UseLocalhost yes
+    #PermitTTY yes
+    #PrintMotd yes
+    #PrintLastLog yes
+    #TCPKeepAlive yes
+    #UseLogin no
+    #UsePrivilegeSeparation sandbox
+    #PermitUserEnvironment no
+    #Compression delayed
+    #ClientAliveInterval 0
+    #ClientAliveCountMax 3
+    #ShowPatchLevel no
+    #UseDNS yes
+    #PidFile /var/run/sshd.pid
+    MaxStartups 10:30:100
+    #PermitTunnel no
+    #ChrootDirectory none
+    #VersionAddendum none
+    
+    # no default banner path
+    #Banner none
+    
+    # Accept locale-related environment variables
+    AcceptEnv LANG LC_CTYPE LC_NUMERIC LC_TIME LC_COLLATE LC_MONETARY LC_MESSAGES
+    AcceptEnv LC_PAPER LC_NAME LC_ADDRESS LC_TELEPHONE LC_MEASUREMENT
+    AcceptEnv LC_IDENTIFICATION LC_ALL LANGUAGE
+    AcceptEnv XMODIFIERS
+    
+    # override default of no subsystems
+    Subsystem       sftp    /usr/libexec/openssh/sftp-server
+    
+    # Example of overriding settings on a per-user basis
+    #Match User anoncvs
+    #       X11Forwarding no
+    #       AllowTcpForwarding no
+    #       PermitTTY no
+    #       ForceCommand cvs server
+---
+# Source: app/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: "sshd-app-ssh"
+  namespace: default
+  labels:
+    helm.sh/chart: app-0.5.1
+    app.kubernetes.io/name: app
+    app.kubernetes.io/instance: sshd
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+
+
+    service.beta.kubernetes.io/aws-load-balancer-backend-protocol: tcp
+    service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: instance
+    service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
+    service.beta.kubernetes.io/aws-load-balancer-type: nlb
+
+
+spec:
+  type: LoadBalancer
+  ports:
+    - name: ssh
+      port: 30802
+      targetPort: 30802
+      
+      protocol: 
+  selector:
+    app.kubernetes.io/name: app
+    app.kubernetes.io/instance: sshd
+---
+# Source: app/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sshd-app
+  namespace: default
+  labels:
+    app: sshd-app
+    version: "latest"
+    helm.sh/chart: app-0.5.1
+    app.kubernetes.io/name: app
+    app.kubernetes.io/instance: sshd
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: app
+      app.kubernetes.io/instance: sshd
+  template:
+    metadata:
+      annotations:
+        co.elastic.logs.sshd-app-service/enabled: "true"
+        checksum/config: d0ff7328a5a6ec06923c011ab85db0a8985917ee5c5c9a63c7103c18f6d3d40f
+      labels:
+        app: sshd-app
+        version: "latest"
+        app.kubernetes.io/name: app
+        app.kubernetes.io/instance: sshd
+    spec:
+      serviceAccountName: default
+      securityContext:
+        {}
+      containers:
+        - name: sshd-app-service
+          envFrom:
+          securityContext:
+            capabilities:
+              add:
+              - SYS_CHROOT
+          command:
+            - /bin/sh
+            - -c
+          args:
+            - mkdir -p /home/nonroot/.ssh ; cp /mnt/ssh/authorized_keys /home/nonroot/.ssh/authorized_keys
+              ; chown 1000:1000 -R /home/nonroot/.ssh ; chmod 400 /home/nonroot/.ssh/authorized_keys;
+              /usr/sbin/sshd -D -e
+          image: "george7522/bastion:latest"
+          imagePullPolicy: Always
+          ports:
+          - name: ssh
+            containerPort: 30802
+            protocol: TCP
+          env:
+          # Params for env vars populated from k8s secrets
+          volumeMounts:
+            - mountPath: /mnt/ssh/authorized_keys
+              name: authorizedkeys
+              readOnly: true
+              subPath: authorized_keys
+            - mountPath: /etc/ssh/sshd_config
+              name: authorizedkeys
+              readOnly: true
+              subPath: sshd_config
+          resources:
+            {}
+      volumes:
+        - configMap:
+            name: ssh-app-authorizedkeys
+          name: authorizedkeys
+---
+# Source: app/templates/tests/test-connection.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "sshd-app-test-connection"
+  labels:
+    helm.sh/chart: app-0.5.1
+    app.kubernetes.io/name: app
+    app.kubernetes.io/instance: sshd
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+    "helm.sh/hook": test
+spec:
+  containers:
+    - name: wget
+      image: busybox
+      command: ['wget']
+      args: ['sshd-app:']
+  restartPolicy: Never

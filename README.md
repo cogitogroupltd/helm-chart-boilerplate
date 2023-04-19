@@ -211,7 +211,7 @@ See output from step 2
 
 ##  2. <a name='Common'></a>Common
 
-A generic helm chart to deploy a multitude of applications to Kubernetes using just a single input file `override-values.yaml`.
+A generic helm chart to deploy a multitude of applications to Kubernetes using just a single input file `values-override.yaml`.
 
 Features:
 - Secrets mounted environment variables `.Values.secenv`
@@ -232,7 +232,7 @@ See [README.md](./charts/common/README.md) for more information
 
 ```bash
 cd helm-chart-boilerplate
-helm upgrade --install sshd ./charts/common --values ./examples/common-sshd-bastion/override-values.yaml
+helm upgrade --install sshd ./charts/common --values ./examples/common-sshd/values-override.yaml
 ```
 
 
@@ -243,7 +243,7 @@ See [README.md](./charts/common/README.md) for more information
 
 ```bash
 cd helm-chart-boilerplate
-helm upgrade --install myrelease ./charts/common --values ./examples/common-backend-autoscaling/override-values.yaml
+helm upgrade --install myrelease ./charts/common --values ./examples/common-backend-autoscaling/values-override.yaml
 ```
 
 ###  2.3. <a name='Example-Completedeploymentoffullcommonfeatures'></a>Example - Complete deployment of full common features
@@ -271,7 +271,7 @@ kubectl create secret regcred \
 - Example 1 install command 
 ```bash
 cd helm-chart-boilerplate
-helm upgrade --install myrelease ./charts/common --values ./examples/common-complete/override-values.yaml
+helm upgrade --install myrelease ./charts/common --values ./examples/common-complete/values-override.yaml
 ```
 
 - Example 2 install command 
@@ -279,7 +279,7 @@ helm upgrade --install myrelease ./charts/common --values ./examples/common-comp
 ```bash
  export AWS_SECRET_ACCESS_KEY # AWS credential for initContainer s3 copy job
  export RABBIT_PASSWD=
-helm upgrade --install myrelease ./charts/common --values ./override-values.yaml --namespace app --set secenv.RABBIT_PASSWD=NadmapyefHybIdviGlyilguvminorcAu  --image.pullPolicy=Always --set "initContainers[0].env[1].value=${AWS_SECRET_ACCESS_KEY}"
+helm upgrade --install myrelease ./charts/common --values ./values-override.yaml --namespace app --set secenv.RABBIT_PASSWD=NadmapyefHybIdviGlyilguvminorcAu  --image.pullPolicy=Always --set "initContainers[0].env[1].value=${AWS_SECRET_ACCESS_KEY}"
 ```
 
 ###  2.4. <a name='Example-SimpleNodeJSexpressserverwithrawYamlinjection'></a>Example - Simple NodeJS express server with rawYaml injection
@@ -289,7 +289,7 @@ See [README.md](./charts/common/README.md) for more information
 ```bash
 cd helm-chart-boilerplate
 export DB_PASSWORD=pass123
-helm upgrade --install node-express ./charts/common --values ./examples/common-node-express/override-values.yaml --set secenv.DB_PASSWORD=${DB_PASSWORD}
+helm upgrade --install node-express ./charts/common --values ./examples/common-node-express/values-override.yaml --set secenv.DB_PASSWORD=${DB_PASSWORD}
 ```
 
 ###  2.5. <a name='Example-HelmChartforOrleansKubernetesapplication'></a>Example - Helm Chart for Orleans Kubernetes application
@@ -299,7 +299,7 @@ See [README.md](./charts/common/README.md) for more information
 ```bash
 cd helm-chart-boilerplate
 export DB_PASSWORD=pass123
-helm upgrade --install node-express ./charts/common --values ./examples/common-orleans//override-values.yaml --set secenv.DB_PASSWORD=${DB_PASSWORD}
+helm upgrade --install node-express ./charts/common --values ./examples/common-orleans/values-override.yaml --set secenv.DB_PASSWORD=${DB_PASSWORD}
 ```
 
 ###  2.6. <a name='Example-SimpleNginxwithstaticfilemounts'></a>Example - Simple Nginx with static file mounts
