@@ -85,7 +85,13 @@ spec:
           args:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          {{- with .Values.image }}
+          {{- if .registry }}
+          image:  {{ .registry }}/{{ .repository }}:{{ .tag }}
+          {{- else }}
+          image:  {{ .repository }}:{{ .tag }}
+          {{- end }}
+          {{- end }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
           {{- range $value := .Values.services }}
