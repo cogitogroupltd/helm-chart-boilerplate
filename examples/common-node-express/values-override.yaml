@@ -3,7 +3,8 @@
 replicaCount: 6
 
 image: 
-  repository: 12345.dkr.ecr.eu-west-2.amazonaws.com/app1
+  registry: 12345.dkr.ecr.eu-west-2.amazonaws.com
+  repository: app1
   tag: "prd-latest"
   pullPolicy: "Always"
 

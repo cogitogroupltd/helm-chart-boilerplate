@@ -1,0 +1,62 @@
+# See ../../charts/common/values.yaml for full list of features
+autoscaling:
+  enabled: true
+  targetCPUUtilizationPercentage: 80
+
+replicaCount: "2"
+
+image:
+  registry: 12345.dkr.ecr.eu-west-2.amazonaws.com
+  repository: app2
+  tag: "484309960e4294189d5a1253924fa29e8ad8dba6-prod"
+  pullPolicy: "Always"
+
+service:
+  enabled: false
+
+env:
+  MY_ENV_VAR: "1"
+
+secenv:
+  MY_SECRET: "2"
+
+configenv:
+  MY_CONFIG_MAP_ENV_VAR: "3"
+
+
+
+resources:
+  requests:
+    cpu: 10m
+    memory: 32Mi
+  limits:
+    cpu: 50m
+    memory: 64Mi
+
+readinessCheck:
+  readinessProbe:
+    tcpSocket:
+      port: http
+    initialDelaySeconds: 5
+    timeoutSeconds: 3
+    periodSeconds: 5
+    successThreshold: 1
+    failureThreshold: 3
+livenessCheck:
+  livenessProbe:
+    tcpSocket:
+      port: http
+    initialDelaySeconds: 30
+    timeoutSeconds: 5
+    periodSeconds: 10
+    successThreshold: 1
+    failureThreshold: 6
+startupCheck:
+  startupProbe:
+    tcpSocket:
+      port: http
+    initialDelaySeconds: 5
+    timeoutSeconds: 3
+    periodSeconds: 5
+    successThreshold: 1
+    failureThreshold: 3
