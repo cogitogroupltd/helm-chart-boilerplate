@@ -17,7 +17,8 @@ services:
   - "0.0.0.0/0" #everywhere
 
 image:
-  repository: "george7522/bastion" # See ./Dockerfile
+  registry: "geroge7522"
+  repository: "bastion" # See ./Dockerfile
   tag: "latest"
   pullPolicy: Always
 

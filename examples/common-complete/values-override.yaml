@@ -7,8 +7,9 @@ autoscaling:
   targetCPUUtilizationPercentage: 80
 
 
-image: 
-  repository: 1234.dkr.ecr.us-east-1.amazonaws.com/nginx
+image:
+  registry: 1234.dkr.ecr.us-east-1.amazonaws.com
+  repository: nginx
   tag: "latest"
   pullPolicy: "IfNotPresent"
 
