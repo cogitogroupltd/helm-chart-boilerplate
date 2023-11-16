@@ -3,7 +3,7 @@
 replicaCount: 2
 
 autoscaling:
-  enabled: true
+  enabled: false
   targetCPUUtilizationPercentage: 80
 
 
