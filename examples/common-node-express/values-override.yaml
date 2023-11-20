@@ -3,8 +3,8 @@
 replicaCount: 6
 
 image: 
-  registry: 12345.dkr.ecr.eu-west-2.amazonaws.com
-  repository: app1
+  registry: docker.io
+  repository: nginx
   tag: "prd-latest"
   pullPolicy: "Always"
 

@@ -6,8 +6,8 @@ autoscaling:
 replicaCount: "2"
 
 image:
-  registry: 12345.dkr.ecr.eu-west-2.amazonaws.com
-  repository: app2
+  registry: docker.io
+  repository: nginx
   tag: "484309960e4294189d5a1253924fa29e8ad8dba6-prod"
   pullPolicy: "Always"
 
