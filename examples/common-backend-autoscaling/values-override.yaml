@@ -1,6 +1,6 @@
 # See ../../charts/common/values.yaml for full list of features
 autoscaling:
-  enabled: false
+  enabled: true
   targetCPUUtilizationPercentage: 80
 
 replicaCount: "2"
