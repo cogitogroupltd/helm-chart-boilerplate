@@ -5,7 +5,7 @@ replicaCount: 6
 image: 
   registry: docker.io
   repository: nginx
-  tag: "prd-latest"
+  tag: "latest"
   pullPolicy: "Always"
 
 serviceAccount:
