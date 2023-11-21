@@ -8,7 +8,7 @@ replicaCount: "2"
 image:
   registry: docker.io
   repository: nginx
-  tag: "484309960e4294189d5a1253924fa29e8ad8dba6-prod"
+  tag: "latest"
   pullPolicy: "Always"
 
 service:
