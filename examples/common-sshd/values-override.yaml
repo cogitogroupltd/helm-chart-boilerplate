@@ -18,7 +18,7 @@ services:
 
 image:
   registry: "geroge7522"
-  repository: "bastion" # See ./Dockerfile
+  repository: "nginx" # See ./Dockerfile
   tag: "latest"
   pullPolicy: Always
 
