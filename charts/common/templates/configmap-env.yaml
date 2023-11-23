@@ -1,0 +1,12 @@
+{{- if .Values.configenv -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "{{ include "generic.fullname" . }}-configmap"
+  labels:
+    {{- include "generic.labels" $ | nindent 4 }}
+data:
+{{ with .Values.configenv }}
+{{ . | toYaml | nindent 2 }}
+{{ end }}
+{{ end }}

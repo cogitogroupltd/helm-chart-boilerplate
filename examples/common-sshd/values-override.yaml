@@ -17,7 +17,7 @@ services:
   - "0.0.0.0/0" #everywhere
 
 image:
-  registry: geroge7522
+  registry: cogitoexample
   repository: bastion # See ./Dockerfile
   tag: "latest"
   pullPolicy: Always
