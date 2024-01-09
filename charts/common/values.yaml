@@ -18,6 +18,9 @@ deploymentLabels: {}
 stdin: "false"
 tty: "false"
 
+command: []
+args: []
+
 imagePullSecrets:
 # - name: regcred
 
