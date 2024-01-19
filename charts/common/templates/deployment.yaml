@@ -33,7 +33,7 @@ spec:
       {{- end }}
       labels:
         app: {{ include "generic.fullname" . }}
-        version: "{{ substr 0 12  .Values.image.tag | default .Chart.AppVersion }}"
+        version: "{{ substr 0 12  .Values.image.tag }}"
         {{- include "generic.selectorLabels" . | nindent 8 }}
     spec:
       {{- with .Values.hostAliases }}
@@ -86,11 +86,17 @@ spec:
             {{- toYaml . | nindent 12 }}
           {{- end }}
           {{- with .Values.image }}
-          {{- if .registry }}
-          image:  {{ .registry }}/{{ .repository }}:{{ .tag }}
+          {{- $imagePath := "" }}
+          {{- if .digest }}
+            {{- $imagePath = (printf "%s@%s" .repository .digest) }}
           {{- else }}
-          image:  {{ .repository }}:{{ .tag }}
+            {{- $defaultTag := .tag }}
+            {{- $imagePath = (printf "%s:%s" .repository $defaultTag) }}
           {{- end }}
+          {{- if .registry }}
+            {{- $imagePath = (printf "%s/%s" .registry $imagePath) }}
+          {{- end }}
+          image: {{ $imagePath | quote }}
           {{- end }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
