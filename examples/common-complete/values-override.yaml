@@ -250,3 +250,23 @@ filesFromSecret:
   rds-combined-ca-bundle-pem:
     secret: rds-combined-ca-bundle
     mountPath: /app/certs
+
+
+externalsecret:
+  enabled: true
+  annotations:
+    helm.sh/hook: pre-install, pre-upgrade
+    helm.sh/hook-delete-policy: before-hook-creation
+    helm.sh/hook-weight: "0"
+    helm.sh/resource-policy: keep
+  records:
+    AWS_ACCESS_KEY_ID: AWS_ACCESS_KEY_ID
+    AWS_LOG_GROUP_NAME: AWS_LOG_GROUP_NAME
+    AWS_REGION: AWS_REGION
+    AWS_SECRET_ACCESS_KEY: AWS_SECRET_ACCESS_KEY
+  refreshInterval: 5m
+  remote_secret_name: dev/backend/secret
+  secretStoreName: dev-aws-secretsmanager
+  secretStoreType: ClusterSecretStore
+  targetSecretName: backend
+  templateEngineVersion: v2

@@ -240,3 +240,6 @@ rawYaml:
       kind: Role
       name: myrelease-app-pod-reader
       apiGroup: ''
+
+externalsecret:
+  enabled: false
