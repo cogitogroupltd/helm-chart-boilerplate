@@ -270,3 +270,39 @@ externalsecret:
   secretStoreType: ClusterSecretStore
   targetSecretName: backend
   templateEngineVersion: v2
+
+
+
+ingress:
+  enabled: true
+  annotations: 
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+
+
+  defaultBackend: 
+    service: 
+      name: "default-backend-service"
+      port: 80
+
+  rules:
+    - host: "some.cogitogroup.co.uk"
+      http:
+        paths:
+          - path: "/"
+            pathType: "Prefix"
+            backend:
+              service:
+                name: "website-app-http"
+                port: 8080
+    - host: "other.cogitogroup.co.uk"
+      http:
+        paths:
+          - path: "/"
+            pathType: "Prefix"
+            backend:
+              service:
+                name: "website-app-http"
+                port: 8080

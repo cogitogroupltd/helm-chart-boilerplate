@@ -222,6 +222,8 @@ initContainers:
 orleans:
   enabled: false
 
+ingress:
+  enabled: false
 
 # Insert raw yaml 
 rawYaml:
