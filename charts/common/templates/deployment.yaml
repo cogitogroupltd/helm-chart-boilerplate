@@ -107,6 +107,13 @@ spec:
             protocol: TCP
           {{- end }}
           {{- end }}
+          {{- range $k, $v := .Values.extraPorts }}
+          - containerPort: {{ $v.containerPort }}
+            name: {{ $v.name }}
+            {{ if eq $v.type "HostPort" }}
+            hostPort: {{ $v.hostPort }}
+            {{- end }}
+          {{- end }}
           env:
           {{- if .Values.env }}
           {{- if .Values.orleans.enabled }}
