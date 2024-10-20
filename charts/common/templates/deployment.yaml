@@ -4,6 +4,8 @@ metadata:
   name: {{ include "generic.fullname" . }}
   namespace: {{ .Release.Namespace }}
   labels:
+    app.kubernetes.io/name: {{ include "generic.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
     app: {{ include "generic.fullname" . }}
     version: "{{ substr 0 12  .Values.image.tag | default .Chart.AppVersion }}"
     {{- include "generic.labels" . | nindent 4 }}
