@@ -1,0 +1,119 @@
+{{- if .Values.jobs.enabled }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "generic.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ include "generic.fullname" . }}
+    version: "{{ substr 0 12  .Values.image.tag | default .Chart.AppVersion }}"
+    {{- include "generic.labels" . | nindent 4 }}
+    {{- with .Values.jobLabels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+      labels:
+        app: {{ include "generic.fullname" . }}
+        version: "{{ substr 0 12  .Values.image.tag }}"
+        {{- include "generic.selectorLabels" . | nindent 8 }}
+    spec:
+      {{ if .Values.serviceAccount.enabled }}
+      serviceAccountName: {{ include "generic.serviceAccountName" . }}
+      {{- end }}
+      restartPolicy: {{ .Values.jobs.restartPolicy | default "Never" | quote }}
+      {{- with .Values.hostAliases }}
+      hostAliases:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        {{- range .Values.jobs.list }}
+        {{- with . }} 
+        - name: {{ .name }}
+          {{- with .Values.image }}
+          {{- $imagePath := "" }}
+          {{- if .digest }}
+            {{- $imagePath = (printf "%s@%s" .repository .digest) }}
+          {{- else }}
+            {{- $defaultTag := .tag }}
+            {{- $imagePath = (printf "%s:%s" .repository $defaultTag) }}
+          {{- end }}
+          {{- if .registry }}
+            {{- $imagePath = (printf "%s/%s" .registry $imagePath) }}
+          {{- end }}
+          image: {{ $imagePath | quote }}
+          {{- end }}
+          imagePullPolicy: {{ .image.pullPolicy }}
+          ports:
+            {{- range $port := .services }} 
+            - name: {{ $port.name }}
+              containerPort: {{ $port.containerPort }}
+              protocol: TCP
+            {{- end }}
+          envFrom:
+            {{ .envFrom | toYaml | nindent 12 }}
+          env:
+            {{- range $key, $value := .env }}
+            - name: {{ $key }}
+              value: {{ $value | quote }}
+            {{- end }}
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+          resources:
+            {{- toYaml .resources | nindent 12 }}
+
+          {{- if .command }}
+          command:
+            {{- toYaml .command | nindent 12 }}
+          {{- end }}
+          {{- if .args }}
+          args:
+            {{- toYaml .args | nindent 12 }}
+          {{- end }}
+
+          {{- if .readinessCheck }}
+          readinessProbe:
+            {{- toYaml .readinessCheck | nindent 12 }}
+          {{- end }}
+          {{- if .livenessCheck }}
+          livenessProbe:
+            {{- toYaml .livenessCheck | nindent 12 }}
+          {{- end }}
+          {{- if .startupCheck }}
+          startupProbe:
+            {{- toYaml .startupCheck | nindent 12 }}
+          {{- end }}
+
+          volumeMounts:
+            {{ .volumeMounts | toYaml | nindent 12 }}
+        {{- end }}
+        {{- end }}
+      {{- with .Values.additionalPodYaml }}
+      {{- toYaml . | nindent 6 }}
+      {{- end }}
+      {{- if .Values.volumes }}
+      volumes:
+        {{- toYaml .Values.volumes | nindent 8 }}
+      {{- end }}
+{{- end }}
