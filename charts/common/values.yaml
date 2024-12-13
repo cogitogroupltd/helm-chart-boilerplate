@@ -271,3 +271,57 @@ rawYaml:
 
 externalsecret:
   enabled: false
+
+jobs:
+  enabled: false
+  # restartPolicy: "OnFailure"
+  # list:
+  #   - name: example-job
+  #     image:
+  #       registry: "docker.io"
+  #       repository: "example/job"
+  #       tag: "v1.0.0"
+  #       pullPolicy: "IfNotPresent"
+  #     env:
+  #       EXAMPLE_ENV_VAR: "value"
+  #       ANOTHER_ENV_VAR: "another_value"
+  #     envFrom:
+  #       - configMapRef:
+  #           name: "example-config"
+  #     command: ["sh", "-c"]
+  #     args: ["echo 'Hello, world!' && sleep 30"]
+  #     resources:
+  #       limits:
+  #         memory: "128Mi"
+  #         cpu: "500m"
+  #       requests:
+  #         memory: "64Mi"
+  #         cpu: "250m"
+  #     volumeMounts:
+  #       - name: example-volume
+  #         mountPath: /data
+  #     readinessCheck:
+  #       httpGet:
+  #         path: /healthz
+  #         port: 8080
+  #       initialDelaySeconds: 5
+  #       periodSeconds: 10
+  #     livenessCheck:
+  #       httpGet:
+  #         path: /healthz
+  #         port: 8080
+  #       initialDelaySeconds: 10
+  #       periodSeconds: 15
+  # hostAliases:
+  #   - ip: "127.0.0.1"
+  #     hostnames:
+  #       - "example.local"
+  # imagePullSecrets:
+  #   - name: "regcred"
+  # additionalPodYaml:
+  #   dnsPolicy: "ClusterFirst"
+  # volumes:
+  #   - name: example-volume
+  #     emptyDir: {}
+  # jobLabels:
+  #   custom-label: "custom-value"
