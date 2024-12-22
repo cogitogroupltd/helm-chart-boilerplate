@@ -1,0 +1,104 @@
+{{- if .Values.deployments.enabled }}
+{{- range .Values.deployments.list }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .name }}
+  namespace: {{ .namespace | default "default" }}
+  labels:
+    {{- if .labels }}
+{{ toYaml .labels | trim | nindent 4 }}
+    {{- end }}
+  annotations:
+    {{- if .annotations }}
+{{ toYaml .annotations | trim | nindent 4 }}
+    {{- end }}
+spec:
+  replicas: {{ .replicas | default 1 }}
+  selector:
+    matchLabels:
+      {{- if .selectorLabels }}
+{{ toYaml .selectorLabels | trim | nindent 6 }}
+      {{- end }}
+  strategy:
+    type: {{ .strategy.type | default "RollingUpdate" }}
+    {{- if .strategy.rollingUpdate }}
+    rollingUpdate:
+      maxSurge: {{ .strategy.rollingUpdate.maxSurge | quote | default "25%" }}
+      maxUnavailable: {{ .strategy.rollingUpdate.maxUnavailable | quote | default "25%" }}
+    {{- end }}
+  template:
+    metadata:
+      labels:
+        {{- if .templateLabels }}
+{{ toYaml .templateLabels | trim | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- if .affinity }}
+      affinity:
+{{ toYaml .affinity | nindent 8 }}
+      {{- end }}
+      containers:
+        {{- range .containers }}
+        - name: {{ .name }}
+          image: {{ .image }}
+          imagePullPolicy: {{ .imagePullPolicy | default "IfNotPresent" }}
+          {{- if .args }}
+          args:
+{{ toYaml .args | nindent 12 }}
+          {{- end }}
+          {{- if .env }}
+          env:
+{{ toYaml .env | nindent 12 }}
+          {{- end }}
+          {{- if .livenessProbe }}
+          livenessProbe:
+{{ toYaml .livenessProbe | nindent 12 }}
+          {{- end }}
+          {{- if .readinessProbe }}
+          readinessProbe:
+{{ toYaml .readinessProbe | nindent 12 }}
+          {{- end }}
+          {{- if .ports }}
+          ports:
+{{ toYaml .ports | nindent 12 }}
+          {{- end }}
+          {{- if or .resources.limits .resources.requests }}
+          resources:
+            {{- if .resources.limits }}
+            limits:
+{{ toYaml .resources.limits | nindent 14 }}
+            {{- end }}
+            {{- if .resources.requests }}
+            requests:
+{{ toYaml .resources.requests | nindent 14 }}
+            {{- end }}
+          {{- end }}
+          {{- if .securityContext }}
+          securityContext:
+{{ toYaml .securityContext | nindent 12 }}
+          {{- end }}
+        {{- end }}
+      {{- if .volumes }}
+      volumes:
+{{ toYaml .volumes | nindent 8 }}
+      {{- end }}
+      {{- if .imagePullSecrets }}
+      imagePullSecrets:
+{{ toYaml .imagePullSecrets | nindent 8 }}
+      {{- end }}
+      {{- if .dnsPolicy }}
+      dnsPolicy: {{ .dnsPolicy }}
+      {{- end }}
+      {{- if .hostNetwork }}
+      hostNetwork: {{ .hostNetwork }}
+      {{- end }}
+      serviceAccountName: {{ .serviceAccountName | default "default" }}
+      terminationGracePeriodSeconds: {{ .terminationGracePeriodSeconds | default 30 }}
+      {{- if .securityContext }}
+      securityContext:
+{{ toYaml .securityContext | nindent 8 }}
+      {{- end }}
+{{- end }}
+{{- end }}

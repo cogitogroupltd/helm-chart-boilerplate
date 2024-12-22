@@ -30,3 +30,7 @@ override.tf.json
 
 certs
 .secretkey
+
+
+# ignore helm values for security
+values-*.yaml

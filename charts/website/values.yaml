@@ -1,0 +1,273 @@
+# Default values
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+
+
+replicaCount: 1
+
+
+image:
+  repository: ""
+  pullPolicy: Always
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "latest"
+
+deploymentLabels: {}
+
+stdin: "false"
+tty: "false"
+
+command: []
+args: []
+
+imagePullSecrets:
+# - name: regcred
+
+redisSidecar: 
+  enabled: false
+  image: redis
+  pullPolicy: Always
+  targetPort: 6379
+  livenessInterval: 30
+
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  enabled: false
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+services:
+  - name: http
+    type: ClusterIP
+    containerPort: 80
+    targetPort: 80
+
+extraPorts: []
+# extraPorts:
+#   - name: "vnc" 
+#     containerPort: 5900
+#     hostPort: 5900
+#     type: HostPort
+
+# Set the default probes to the endpoints already implemented in the dotnet service chassis
+startupProbe: {}
+
+livenessProbe: {}
+
+readinessProbe: {}
+
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 1
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+nodeSelector:
+  # beta.kubernetes.io/os: linux
+  # beta.kubernetes.io/arch: amd64
+
+env: []
+
+tolerations: []
+
+affinity: {}
+
+# eg. hooks can be used to prepopulate a DB before the Kubernetes deployment starts
+hook: 
+  enabled: false
+  image:
+    repository: "mcr.microsoft.com/mssql-tools"
+    pullPolicy: Always
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: "1.0.0"
+  # env:
+  #   DATABASE_NAME: example1
+  # args: ["source /scripts/sleep.sh"] 
+  # files: 
+  #   sleep.sh: | 
+  #     sleep 100000
+
+# hostAliases:
+# - ip: "127.0.0.1"
+#   hostnames:
+#   - "redis"
+
+persistence:
+  enabled: false
+  # pvcs:
+  # - name: nginx-service-logs-pvc
+  #   storageClassName: local-path
+  #   accessMode: ReadWriteMany
+  #   size: 25Gi
+  # - name: nginx-service-pvc
+  #   storageClassName: local-path
+  #   accessMode: ReadWriteMany
+  #   size: 26Gi
+    
+
+  # persistentVolumes:
+  # - name: nginx-service-logs
+  #   size: 25Gi
+  #   volumeMode: Filesystem
+  #   accessMode: ReadWriteMany
+  #   claimRef: nginx-service-logs-pvc
+  #   persistentVolumeReclaimPolicy: Retain
+  #   storageClassName: local-path
+  #   localPath: /mnt/logs
+  #   nodeAffinityRules:
+  #     nodeAffinity:
+  #       required:
+  #         nodeSelectorTerms:
+  #           - matchExpressions:
+  #               - key: kubernetes.io/arch
+  #                 operator: In
+  #                 values:
+  #                   - amd64
+  # - name: nginx-service-pv
+  #   size: 26Gi
+  #   volumeMode: Filesystem
+  #   accessMode: ReadWriteMany
+  #   claimRef: nginx-service-pvc
+  #   persistentVolumeReclaimPolicy: Retain
+  #   storageClassName: local-path
+  #   localPath: /mnt/rabbitmq_logs 
+  #   nodeAffinityRules:
+  #     nodeAffinity:
+  #       required:
+  #         nodeSelectorTerms:
+  #           - matchExpressions:
+  #               - key: kubernetes.io/arch
+  #                 operator: In
+  #                 values:
+  #                   - amd64
+                    
+
+extraVolumeMounts: []
+extraVolumes: []
+
+# Inline option to mount a file into a configMap
+configMap:
+  enabled: false
+  envFrom: false
+# configMap:
+#   enabled: true
+#   name: nginx-conf
+#   files: 
+#     nginx.conf: |
+#       env API_PROXY_CRED;
+#       worker_processes  1;
+#       pid /var/run/openresty/nginx.pid;
+#       events {
+#           worker_connections  1024;
+#       }
+
+# Inline option to mount a file into a secret
+secret:
+  enabled: false
+# secret:
+#   enabled: true
+#   name: settings.yaml
+#   files: 
+#     settings.yaml: |
+#       DEVICE_AUTHENTICATION_SERVICE_DATABASE_URI: "postgresql://developer:developer@some.url.io:5432/db"
+
+
+
+# Reference an existing secret and create corresponding VolumeMounts and Volumes 
+# filesFromSecret:
+#   rds-combined-ca-bundle-pem:
+#     secret: rds-combined-ca-bundle
+#     mountPath: /app/certs
+
+initContainers:
+  # enabled: false
+  # image:
+  #   repository: 
+  #   tag: 
+  #   imagePullPolicy: 
+  # command: []
+  # args: []
+  # extraVolumes: []
+  # extraVolumeMounts: []
+
+
+# Orleans requires environment configurations
+orleans:
+  enabled: false
+
+ingress:
+  enabled: false
+  # rules:
+  #   - host: "www.cogitogroup.co.uk"
+  #     http:
+  #       paths:
+  #         - path: "/"
+  #           pathType: "Prefix"
+  #           backend:
+  #             service:
+  #               name: "website-app-http"
+  #               port: 8080
+  #   - host: "cogitogroup.co.uk"
+  #     http:
+  #       paths:
+  #         - path: "/"
+  #           pathType: "Prefix"
+  #           backend:
+  #             service:
+  #               name: "website-app-http"
+  #               port: 8080
+  
+# Insert raw yaml 
+rawYaml:
+  enabled: false
+  content: |
+    kind: RoleBinding
+    apiVersion: rbac.authorization.k8s.io/v1
+    metadata:
+      name: myrelease-app-pod-reader-binding1
+      namespace: default
+    subjects:
+    - kind: ServiceAccount
+      name: myrelease-app
+      apiGroup: ''
+    roleRef:
+      kind: Role
+      name: myrelease-app-pod-reader
+      apiGroup: ''
+
+externalsecret:
+  enabled: false
