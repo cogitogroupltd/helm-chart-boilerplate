@@ -271,3 +271,140 @@ rawYaml:
 
 externalsecret:
   enabled: false
+
+
+statefulsets:
+  enabled: true
+  list:
+    - name: miacademy-redis-master
+      namespace: miaplaza
+      labels:
+        app: redis
+      annotations: {}
+      replicas: 1
+      serviceName: miacademy-redis-headless
+      podManagementPolicy: OrderedReady
+      revisionHistoryLimit: 10
+      persistentVolumeClaimRetentionPolicy:
+        whenDeleted: Retain
+        whenScaled: Retain
+      updateStrategy:
+        type: RollingUpdate
+      selectorLabels:
+        app: redis
+
+      template:
+        annotations: {}
+        labels:
+          app: redis
+        securityContext:
+          fsGroup: 1001
+        dnsPolicy: ClusterFirst
+        terminationGracePeriodSeconds: 30
+
+      containers:
+        - name: redis
+          image: docker.io/bitnami/redis:6.0.10-debian-10-r1
+          imagePullPolicy: IfNotPresent
+          command:
+            - /bin/bash
+            - -c
+            - /opt/bitnami/scripts/start-scripts/start-master.sh
+          env:
+            - name: REDIS_REPLICATION_MODE
+              value: "master"
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: miacademy-website-redis
+                  key: redis-password
+            - name: REDIS_TLS_ENABLED
+              value: "no"
+            - name: REDIS_PORT
+              value: "6379"
+          livenessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - /health/ping_liveness_local.sh 5
+            failureThreshold: 5
+            initialDelaySeconds: 5
+            periodSeconds: 60
+            successThreshold: 1
+            timeoutSeconds: 6
+          ports:
+            - name: redis
+              containerPort: 6379
+              protocol: TCP
+          resources: {}
+          securityContext:
+            runAsUser: 1001
+          volumeMounts:
+            - name: start-scripts
+              mountPath: /opt/bitnami/scripts/start-scripts
+            - name: health
+              mountPath: /health
+            - name: redis-data
+              mountPath: /data
+            - name: config
+              mountPath: /opt/bitnami/redis/mounted-etc
+            - name: redis-tmp-conf
+              mountPath: /opt/bitnami/redis/etc/
+
+        - name: metrics
+          image: docker.io/bitnami/redis-exporter:1.15.1-debian-10-r2
+          imagePullPolicy: IfNotPresent
+          command:
+            - /bin/bash
+            - -c
+            - |
+              if [[ -f '/secrets/redis-password' ]]; then
+                export REDIS_PASSWORD=$(cat /secrets/redis-password)
+              fi
+              redis_exporter
+          env:
+            - name: REDIS_ALIAS
+              value: "miacademy-redis"
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: miacademy-website-redis
+                  key: redis-password
+          ports:
+            - name: metrics
+              containerPort: 9121
+              protocol: TCP
+          resources: {}
+          securityContext:
+            runAsUser: 1001
+
+      volumes:
+        - name: start-scripts
+          configMap:
+            name: miacademy-redis-scripts
+            defaultMode: 493
+        - name: health
+          configMap:
+            name: miacademy-redis-health
+            defaultMode: 493
+        - name: config
+          configMap:
+            name: miacademy-redis
+            defaultMode: 420
+        - name: redis-tmp-conf
+          emptyDir: {}
+
+      volumeClaimTemplates:
+        - name: redis-data
+          labels:
+            app: redis
+            component: master
+            heritage: Helm
+            release: miacademy
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 8Gi
+          volumeMode: Filesystem

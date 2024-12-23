@@ -1,30 +1,49 @@
-{{- if .Values.services }}
-{{- range $value := .Values.services }}
+{{- if and .Values.app.services .Values.app.services.enabled }}
+{{- range .Values.app.services.list }}
+---
 apiVersion: v1
 kind: Service
 metadata:
-  name: "{{ include "generic.fullname" $ }}-{{ $value.name }}"
-  namespace: {{ $.Release.Namespace }}
+  name: "{{ .name }}"
+  namespace: "{{ .namespace | default $.Release.Namespace }}"
   labels:
-    {{- include "generic.labels" $ | nindent 4 }}
+    {{- if .labels }}
+    {{ .labels | toYaml | nindent 4 }}
+    {{- end }}
   annotations:
-{{ if $value.annotations }}
-{{ with $value.annotations }}
-{{ .| toYaml | indent 4}}
-{{ end }}
-{{ end }}
+    {{- if .annotations }}
+    {{ .annotations | toYaml | nindent 4 }}
+    {{- else }}
+    {}
+    {{- end }}
 spec:
-  type: {{ $value.type }}
+  clusterIP: {{ .spec.clusterIP | default "None" }}
+  {{- if .spec.clusterIPs }}
+  clusterIPs:
+  {{ .spec.clusterIPs | toYaml | nindent 2 }}
+  {{- end }}
+  internalTrafficPolicy: {{ .spec.internalTrafficPolicy | default "Cluster" }}
+  {{- if .spec.ipFamilies }}
+  ipFamilies:
+  {{ .spec.ipFamilies | toYaml | nindent 2 }}
+  {{- end }}
+  ipFamilyPolicy: {{ .spec.ipFamilyPolicy | default "SingleStack" }}
   ports:
-    - name: {{ $value.name }}
-      port: {{ $value.containerPort }}
-      targetPort: {{ $value.targetPort }}
-      {{ if and (eq $value.type "NodePort") ($value.nodePort)}}
-      nodePort: {{ $value.nodePort }}
-      {{ end }}
-      protocol: {{ $value.protocol }}
+    {{- range .spec.ports }}
+    - name: {{ .name }}
+      port: {{ .port }}
+      targetPort: {{ .targetPort | default .port }}
+      protocol: {{ .protocol | default "TCP" }}
+    {{- end }}
+  {{- if .spec.publishNotReadyAddresses }}
+  publishNotReadyAddresses: {{ .spec.publishNotReadyAddresses }}
+  {{- end }}
   selector:
-    {{- include "generic.selectorLabels" $ | nindent 4 }}
----
+    {{- if .spec.selector }}
+    {{ .spec.selector | toYaml | nindent 4 }}
+    {{- end }}
+  sessionAffinity: {{ .spec.sessionAffinity | default "None" }}
+  type: {{ .spec.type | default "ClusterIP" }}
 {{- end }}
 {{- end }}
+ 

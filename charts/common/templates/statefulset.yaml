@@ -1,0 +1,221 @@
+{{- if and .Values.statefulsets .Values.statefulsets.enabled }}
+{{- range .Values.statefulsets.list }}
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ .name }}
+  namespace: {{ .namespace | default "default" }}
+  labels:
+    {{- if .labels }}
+{{ toYaml .labels | nindent 4 }}
+    {{- end }}
+  annotations:
+    {{- if .annotations }}
+{{ toYaml .annotations | nindent 4 }}
+    {{- end }}
+spec:
+  replicas: {{ .replicas | default 1 }}
+  serviceName: {{ .serviceName | default "default-service" }}
+  podManagementPolicy: {{ .podManagementPolicy | default "OrderedReady" }}
+  revisionHistoryLimit: {{ .revisionHistoryLimit | default 10 }}
+  {{- if .persistentVolumeClaimRetentionPolicy }}
+  persistentVolumeClaimRetentionPolicy:
+    whenDeleted: {{ .persistentVolumeClaimRetentionPolicy.whenDeleted | default "Retain" }}
+    whenScaled: {{ .persistentVolumeClaimRetentionPolicy.whenScaled | default "Retain" }}
+  {{- end }}
+  {{- if .updateStrategy }}
+  updateStrategy:
+{{ toYaml .updateStrategy | nindent 4 }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- if .selectorLabels }}
+{{ toYaml .selectorLabels | nindent 6 }}
+      {{- else if .labels }}
+{{ toYaml .labels | nindent 6 }}
+      {{- end }}
+  template:
+    metadata:
+      labels:
+        {{- if .labels }}
+{{ toYaml .labels | nindent 8 }}
+        {{- end }}
+      {{- /* Optional per-Pod annotations if .template.annotations is set */}}
+      {{- if and .template (hasKey .template "annotations") (not (empty .template.annotations)) }}
+      annotations:
+{{ toYaml .template.annotations | nindent 8 }}
+      {{- end }}
+    spec:
+      {{- /* Optional Pod-level security context */}}
+      {{- if and .template (hasKey .template "securityContext") }}
+      securityContext:
+{{ toYaml .template.securityContext | nindent 8 }}
+      {{- end }}
+      {{- /* Optional Pod-level DNS policy */}}
+      {{- if and .template (hasKey .template "dnsPolicy") }}
+      dnsPolicy: {{ .template.dnsPolicy }}
+      {{- end }}
+      {{- /* Optional Pod-level terminationGracePeriodSeconds */}}
+      {{- if and .template (hasKey .template "terminationGracePeriodSeconds") }}
+      terminationGracePeriodSeconds: {{ .template.terminationGracePeriodSeconds }}
+      {{- end }}
+      {{- /* Optional Pod-level affinity */}}
+      {{- if and .template (hasKey .template "affinity") }}
+      affinity:
+{{ toYaml .template.affinity | nindent 6 }}
+      {{- end }}
+      {{- /* Optional Pod-level imagePullSecrets */}}
+      {{- if and .template (hasKey .template "imagePullSecrets") (not (empty .template.imagePullSecrets)) }}
+      imagePullSecrets:
+{{ toYaml .template.imagePullSecrets | nindent 6 }}
+      {{- end }}
+      {{- /* Optional initContainers if .template.initContainers is set */}}
+      {{- if and .template (hasKey .template "initContainers") (not (empty .template.initContainers)) }}
+      initContainers:
+      {{- range .template.initContainers }}
+        - name: {{ .name }}
+          image: {{ .image }}
+          {{- if .imagePullPolicy }}
+          imagePullPolicy: {{ .imagePullPolicy }}
+          {{- end }}
+          {{- if .command }}
+          command:
+{{ toYaml .command | nindent 12 }}
+          {{- end }}
+          {{- if .args }}
+          args:
+{{ toYaml .args | nindent 12 }}
+          {{- end }}
+          {{- if .env }}
+          env:
+          {{- range .env }}
+            - name: {{ .name }}
+              {{- if .value }}
+              value: {{ .value | quote }}
+              {{- else if .valueFrom }}
+              valueFrom:
+{{ toYaml .valueFrom | nindent 16 }}
+              {{- end }}
+          {{- end }}
+          {{- end }}
+          {{- if .volumeMounts }}
+          volumeMounts:
+          {{- range .volumeMounts }}
+            - name: {{ .name }}
+              mountPath: {{ .mountPath }}
+              {{- if .subPath }}
+              subPath: {{ .subPath }}
+              {{- end }}
+          {{- end }}
+          {{- end }}
+          {{- if .resources }}
+          resources:
+{{ toYaml .resources | nindent 12 }}
+          {{- end }}
+          {{- if .securityContext }}
+          securityContext:
+{{ toYaml .securityContext | nindent 12 }}
+          {{- end }}
+      {{- end }}
+      {{- end }}
+      containers:
+      {{- if .containers }}
+      {{- range .containers }}
+        - name: {{ .name }}
+          image: {{ .image }}
+          imagePullPolicy: {{ .imagePullPolicy | default "IfNotPresent" }}
+          {{- if .ports }}
+          ports:
+          {{- range .ports }}
+            - name: {{ .name }}
+              containerPort: {{ .containerPort }}
+              protocol: {{ .protocol | default "TCP" }}
+          {{- end }}
+          {{- end }}
+          {{- if .env }}
+          env:
+          {{- range .env }}
+            - name: {{ .name }}
+              {{- if .value }}
+              value: {{ .value | quote }}
+              {{- else if .valueFrom }}
+              valueFrom:
+{{ toYaml .valueFrom | nindent 16 }}
+              {{- end }}
+          {{- end }}
+          {{- end }}
+          {{- if .volumeMounts }}
+          volumeMounts:
+          {{- range .volumeMounts }}
+            - name: {{ .name }}
+              mountPath: {{ .mountPath }}
+              {{- if .subPath }}
+              subPath: {{ .subPath }}
+              {{- end }}
+          {{- end }}
+          {{- end }}
+          {{- if .resources }}
+          resources:
+{{ toYaml .resources | nindent 12 }}
+          {{- end }}
+          {{- if .livenessProbe }}
+          livenessProbe:
+{{ toYaml .livenessProbe | nindent 12 }}
+          {{- end }}
+          {{- if .readinessProbe }}
+          readinessProbe:
+{{ toYaml .readinessProbe | nindent 12 }}
+          {{- end }}
+          {{- if .securityContext }}
+          securityContext:
+{{ toYaml .securityContext | nindent 12 }}
+          {{- end }}
+      {{- end }}
+      {{- end }}
+      {{- if .volumes }}
+      volumes:
+      {{- range .volumes }}
+        - name: {{ .name }}
+          {{- if .configMap }}
+          configMap:
+{{ toYaml .configMap | nindent 12 }}
+          {{- end }}
+          {{- if .secret }}
+          secret:
+{{ toYaml .secret | nindent 12 }}
+          {{- end }}
+          {{- if .emptyDir }}
+          emptyDir: {}
+          {{- end }}
+          {{- if .persistentVolumeClaim }}
+          persistentVolumeClaim:
+{{ toYaml .persistentVolumeClaim | nindent 12 }}
+          {{- end }}
+      {{- end }}
+      {{- end }}
+  {{- if .volumeClaimTemplates }}
+  volumeClaimTemplates:
+  {{- range .volumeClaimTemplates }}
+    - kind: PersistentVolumeClaim
+      metadata:
+        name: {{ .name }}
+        {{- if .labels }}
+        labels:
+{{ toYaml .labels | nindent 10 }}
+        {{- end }}
+      spec:
+        accessModes:
+        {{- range .accessModes }}
+          - {{ . }}
+        {{- end }}
+        resources:
+          requests:
+            storage: {{ .resources.requests.storage }}
+        {{- if .volumeMode }}
+        volumeMode: {{ .volumeMode }}
+        {{- end }}
+  {{- end }}
+  {{- end }}
+{{- end }}
+{{- end }}

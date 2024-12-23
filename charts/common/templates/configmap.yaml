@@ -1,17 +1,29 @@
-{{- if and (.Values.configMap.enabled) (.Values.configMap.files) -}}
+---
+{{- if and .Values.configMaps.enabled .Values.configMaps.list }}
+{{- range .Values.configMaps.list }}
+---
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: "{{ .Values.configMap.name }}"
-  namespace: "{{ .Release.Namespace }}"
+  name: "{{ .name }}"
+  namespace: "{{ $.Release.Namespace }}"
   labels:
     {{- include "generic.labels" $ | nindent 4 }}
+    {{- if .labels }}
+    {{ toYaml .labels | nindent 4 }}
+    {{- end }}
+  annotations:
+    {{- if .annotations }}
+    {{ toYaml .annotations | nindent 4 }}
+    {{- else }}
+    {}
+    {{- end }}
 data:
-{{- if .Values.configMap.files }}
-{{- range $key, $value := .Values.configMap.files }}
+  {{- if .files }}
+  {{- range $key, $value := .files }}
   {{ $key }}: |-
-{{ $value | indent 4 }}
-{{ "" | indent 0 }}
-{{- end -}}
-{{- end -}}
-{{- end -}}
+{{ $value | nindent 4 }}
+  {{- end }}
+  {{- end }}
+{{- end }}
+{{- end }}

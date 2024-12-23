@@ -30,3 +30,6 @@ override.tf.json
 
 certs
 .secretkey
+
+# ignore values files for miaplaza and default for containing sensetive data 
+values-*.yaml

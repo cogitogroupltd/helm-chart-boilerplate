@@ -1,224 +1,104 @@
+{{- if .Values.deployments.enabled }}
+{{- range .Values.deployments.list }}
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "generic.fullname" . }}
-  namespace: {{ .Release.Namespace }}
+  name: {{ .name }}
+  namespace: {{ .namespace | default "default" }}
   labels:
-    app.kubernetes.io/name: {{ include "generic.name" . }}
-    app.kubernetes.io/instance: {{ .Release.Name }}
-    app: {{ include "generic.fullname" . }}
-    version: "{{ substr 0 12  .Values.image.tag | default .Chart.AppVersion }}"
-    {{- include "generic.labels" . | nindent 4 }}
-    {{- with .Values.deploymentLabels }}
-    {{- toYaml . | nindent 4 }}
+    {{- if .labels }}
+{{ toYaml .labels | trim | nindent 4 }}
     {{- end }}
-    {{- if .Values.orleans.enabled }}
-    orleans/serviceId: {{ include "generic.fullname" . }}
+  annotations:
+    {{- if .annotations }}
+{{ toYaml .annotations | trim | nindent 4 }}
     {{- end }}
 spec:
-  {{- if not .Values.autoscaling.enabled }}
-  replicas: {{ .Values.replicaCount }}
-  {{- end }}
+  replicas: {{ .replicas | default 1 }}
   selector:
     matchLabels:
-      {{- include "generic.selectorLabels" . | nindent 6 }}
-  {{- with .Values.updateStrategy }}
-  {{- toYaml . | nindent 2 }}
-  {{- end }}
+      {{- if .selectorLabels }}
+{{ toYaml .selectorLabels | trim | nindent 6 }}
+      {{- end }}
+  strategy:
+    type: {{ .strategy.type | default "RollingUpdate" }}
+    {{- if .strategy.rollingUpdate }}
+    rollingUpdate:
+      maxSurge: {{ .strategy.rollingUpdate.maxSurge | quote | default "25%" }}
+      maxUnavailable: {{ .strategy.rollingUpdate.maxUnavailable | quote | default "25%" }}
+    {{- end }}
   template:
     metadata:
-      annotations:
-        co.elastic.logs.{{ include "generic.fullname" . }}-service/enabled: "true"
-        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
-      {{- with .Values.podAnnotations }}
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
       labels:
-        app: {{ include "generic.fullname" . }}
-        version: "{{ substr 0 12  .Values.image.tag }}"
-        {{- include "generic.selectorLabels" . | nindent 8 }}
+        {{- if .templateLabels }}
+{{ toYaml .templateLabels | trim | nindent 8 }}
+        {{- end }}
     spec:
-      {{- with .Values.hostAliases }}
-      hostAliases:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.imagePullSecrets }}
-      imagePullSecrets:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.additionalPodYaml }}
-      {{- toYaml . | nindent 6 }}
-      {{- end }}
-      serviceAccountName: {{ include "generic.serviceAccountName" . }}
-      securityContext:
-        {{- toYaml .Values.podSecurityContext | nindent 8 }}
-      {{- if .Values.initContainers }}
-      initContainers:
-      {{- with .Values.initContainers }}
-      {{- toYaml . | nindent 8 }}
-      {{- end }}
+      {{- if .affinity }}
+      affinity:
+{{ toYaml .affinity | nindent 8 }}
       {{- end }}
       containers:
-        - name: {{ include "generic.fullname" . }}-service
-        {{- if or .Values.configMap.envFrom .Values.configMap.enabled .Values.configenv .Values.secenv }}
-          envFrom: 
-        {{- end }}  
-        {{- if .Values.configenv }}
-          - configMapRef:
-              name: {{ include "generic.fullname" . }}-configmap
-        {{- end }}  
-        {{- if .Values.secenv }}
-          - secretRef:
-              name: {{ include "generic.fullname" . }}-secenv
-        {{- end }}  
-        {{- if eq .Values.tty "true" }}
-          tty: true
-        {{- end }}
-        {{- if eq .Values.stdin "true" }}
-          stdin: true
-        {{- end }}
-          securityContext:
-            {{- toYaml .Values.securityContext | nindent 12 }}
-          {{- with .Values.command }}
-          command:
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
-          {{- with .Values.args }}
+        {{- range .containers }}
+        - name: {{ .name }}
+          image: {{ .image }}
+          imagePullPolicy: {{ .imagePullPolicy | default "IfNotPresent" }}
+          {{- if .args }}
           args:
-            {{- toYaml . | nindent 12 }}
+{{ toYaml .args | nindent 12 }}
           {{- end }}
-          {{- with .Values.image }}
-          {{- $imagePath := "" }}
-          {{- if .digest }}
-            {{- $imagePath = (printf "%s@%s" .repository .digest) }}
-          {{- else }}
-            {{- $defaultTag := .tag }}
-            {{- $imagePath = (printf "%s:%s" .repository $defaultTag) }}
+          {{- if .env }}
+          env:
+{{ toYaml .env | nindent 12 }}
           {{- end }}
-          {{- if .registry }}
-            {{- $imagePath = (printf "%s/%s" .registry $imagePath) }}
+          {{- if .livenessProbe }}
+          livenessProbe:
+{{ toYaml .livenessProbe | nindent 12 }}
           {{- end }}
-          image: {{ $imagePath | quote }}
+          {{- if .readinessProbe }}
+          readinessProbe:
+{{ toYaml .readinessProbe | nindent 12 }}
           {{- end }}
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- if .ports }}
           ports:
-          {{- range $value := .Values.services }}
-          {{- if not (empty $value) }}
-          - name: {{ $value.name }}
-            containerPort: {{ $value.containerPort }}
-            protocol: TCP
+{{ toYaml .ports | nindent 12 }}
           {{- end }}
-          {{- end }}
-          {{- range $k, $v := .Values.extraPorts }}
-          - containerPort: {{ $v.containerPort }}
-            name: {{ $v.name }}
-            {{ if eq $v.type "HostPort" }}
-            hostPort: {{ $v.hostPort }}
+          {{- if or .resources.limits .resources.requests }}
+          resources:
+            {{- if .resources.limits }}
+            limits:
+{{ toYaml .resources.limits | nindent 14 }}
+            {{- end }}
+            {{- if .resources.requests }}
+            requests:
+{{ toYaml .resources.requests | nindent 14 }}
             {{- end }}
           {{- end }}
-          env:
-          {{- if .Values.env }}
-          {{- if .Values.orleans.enabled }}
-          # Configure settings to let Orleans know which cluster it belongs to
-          # and which pod it is running in
-          - name: ORLEANS_SERVICE_ID
-            valueFrom:
-              fieldRef:
-                fieldPath: metadata.labels['orleans/serviceId']
-          - name: ORLEANS_CLUSTER_ID
-            valueFrom:
-              fieldRef:
-                fieldPath: metadata.labels['orleans/clusterId']
-          {{- end }}
-          - name: POD_NAMESPACE
-            valueFrom:
-              fieldRef:
-                fieldPath: metadata.namespace
-          - name: POD_NAME
-            valueFrom:
-              fieldRef:
-                fieldPath: metadata.name
-          - name: POD_IP
-            valueFrom:
-              fieldRef:
-                fieldPath: status.podIP
-          {{- range $name, $value := .Values.env }}
-          {{- if not (empty $value) }}
-          - name: {{ $name | quote }}
-            value: {{ $value | quote }}
-          {{- end }}
-          {{- end }}
-          {{- end }}
-          # Params for env vars populated from k8s secrets
-          {{- if .Values.envVarsFromSecret }}
-          {{- range $key, $value := .Values.envVarsFromSecret }}
-          - name: {{ $key }}
-            valueFrom:
-              secretKeyRef:
-                name: {{ $value.secretKeyRef | quote }}
-                key: {{ $value.key | quote }}
-          {{- end }}
-          {{- end }}
-          {{- if or .Values.filesFromSecret .Values.extraVolumeMounts }}
-          volumeMounts:
-          {{- if .Values.extraVolumeMounts }}
-          {{- toYaml .Values.extraVolumeMounts | nindent 12 }}
-          {{- end }}
-          {{- with .Values.filesFromSecret }}
-          {{- range $key, $value := . }}
-            - name: {{ $key }}
-              mountPath: {{ $value.mountPath }}
-              readOnly: true
-          {{- end }}
-          {{- end }}
-          {{- end }}
-          {{- with .Values.readinessCheck }}
-          {{- toYaml . | nindent 10 }}
-          {{- end }}
-          {{- with .Values.livenessCheck }}
-          {{- toYaml . | nindent 10 }}
-          {{- end }}
-          {{- with .Values.startupCheck }}
-          {{- toYaml . | nindent 10 }}
-          {{- end }}
-          resources:
-            {{- toYaml .Values.resources | nindent 12 }}
-        {{- if .Values.redisSidecar.enabled }}
-        - name: {{ include "generic.fullname" . }}-redis
+          {{- if .securityContext }}
           securityContext:
-            {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.redisSidecar.image }}"
-          imagePullPolicy: {{ .Values.redisSidecar.pullPolicy }}
-          readinessProbe:
-            tcpSocket:
-              port: {{ .Values.redisSidecar.targetPort }}
-          livenessProbe:
-            tcpSocket:
-              port: {{ .Values.redisSidecar.targetPort }}
-            periodSeconds: {{ .Values.redisSidecar.livenessInterval }}
+{{ toYaml .securityContext | nindent 12 }}
+          {{- end }}
         {{- end }}
-      {{- with .Values.nodeSelector }}
-      nodeSelector:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.affinity }}
-      affinity:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.tolerations }}
-      tolerations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- if or .Values.filesFromSecret .Values.extraVolumes }}
+      {{- if .volumes }}
       volumes:
-      {{- if .Values.extraVolumes }}
-      {{- toYaml .Values.extraVolumes | nindent 8 }}
+{{ toYaml .volumes | nindent 8 }}
       {{- end }}
-      {{- with .Values.filesFromSecret }}
-      {{- range $key, $value := . }}
-        - name: {{ $key }}
-          secret:
-            secretName: {{ $value.secret }}
+      {{- if .imagePullSecrets }}
+      imagePullSecrets:
+{{ toYaml .imagePullSecrets | nindent 8 }}
       {{- end }}
+      {{- if .dnsPolicy }}
+      dnsPolicy: {{ .dnsPolicy }}
       {{- end }}
+      {{- if .hostNetwork }}
+      hostNetwork: {{ .hostNetwork }}
       {{- end }}
+      serviceAccountName: {{ .serviceAccountName | default "default" }}
+      terminationGracePeriodSeconds: {{ .terminationGracePeriodSeconds | default 30 }}
+      {{- if .securityContext }}
+      securityContext:
+{{ toYaml .securityContext | nindent 8 }}
+      {{- end }}
+{{- end }}
+{{- end }}

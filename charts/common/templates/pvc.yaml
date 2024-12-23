@@ -1,22 +1,25 @@
 {{- if .Values.persistence.enabled }}
-{{- range $value := .Values.persistence.pvcs }}
-
+{{- range .Values.persistence.pvcs }}
+---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: {{ $value.name }}
-  namespace: {{ $.Release.Namespace }}
+  name: {{ .name }}
+  namespace: {{ .namespace | default $.Release.Namespace }}
   labels:
+    {{- if .labels }}
+    {{- .labels | toYaml | nindent 4 }}
+    {{- else }}
     app: {{ include "generic.fullname" $ }}
     version: "{{ substr 0 12 $.Values.image.tag | default $.Chart.AppVersion }}"
     {{- include "generic.labels" $ | nindent 4 }}
+    {{- end }}
 spec:
-  storageClassName: {{ $value.storageClassName }}
+  storageClassName: {{ .storageClassName | default "standard" }}
   accessModes:
-    - {{ $value.accessMode }}
+    - {{ .accessMode | default "ReadWriteOnce" }}
   resources:
     requests:
-      storage: {{ $value.size }}
----
-{{ end }}
-{{ end }}
+      storage: {{ .size }}
+{{- end }}
+{{- end }}
