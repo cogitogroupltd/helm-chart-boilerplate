@@ -17,7 +17,9 @@ metadata:
     {}
     {{- end }}
 spec:
-  clusterIP: {{ .spec.clusterIP | default "None" }}
+  {{- if .spec.clusterIP }}
+  clusterIP: {{ .spec.clusterIP }}
+  {{- end }}
   {{- if .spec.clusterIPs }}
   clusterIPs:
   {{ .spec.clusterIPs | toYaml | nindent 2 }}
@@ -46,4 +48,3 @@ spec:
   type: {{ .spec.type | default "ClusterIP" }}
 {{- end }}
 {{- end }}
- 
