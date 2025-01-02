@@ -1,0 +1,113 @@
+---
+# Source: miacademy-writemostly-maintenance/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: test
+  name: miacademy-writemostly-maintenance
+  labels:
+    helm.sh/chart: miacademy-writemostly-maintenance-0.1.0
+    app.kubernetes.io/name: miacademy-writemostly-maintenance
+    app.kubernetes.io/instance: miacademy-writemostly-maintenance-test
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+    
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app.kubernetes.io/name: miacademy-writemostly-maintenance
+    app.kubernetes.io/instance: miacademy-writemostly-maintenance-test
+---
+# Source: miacademy-writemostly-maintenance/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name : miacademy-writemostly-maintenance
+  annotations:
+    
+    {}
+  labels:
+    helm.sh/chart: miacademy-writemostly-maintenance-0.1.0
+    app.kubernetes.io/name: miacademy-writemostly-maintenance
+    app.kubernetes.io/instance: miacademy-writemostly-maintenance-test
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+    
+  namespace: test
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: miacademy-writemostly-maintenance
+      app.kubernetes.io/instance: miacademy-writemostly-maintenance-test
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        helm.sh/chart: miacademy-writemostly-maintenance-0.1.0
+        app.kubernetes.io/name: miacademy-writemostly-maintenance
+        app.kubernetes.io/instance: miacademy-writemostly-maintenance-test
+        app.kubernetes.io/version: "1.16.0"
+        app.kubernetes.io/managed-by: Helm
+        
+      annotations:
+        
+        {}
+    spec:
+      automountServiceAccountToken: true
+      imagePullSecrets:
+        - name: miaplaza-website-registry
+        - name: infrastructure-postgresql-registry
+        - name: infrastructure-nginx-registry
+      volumes:
+        - name: pgdata
+          persistentVolumeClaim:
+            claimName: data-miacademy-writemostly-0
+        - name: pgbackrest
+          secret:
+            defaultMode: 420
+            secretName: pgbackrest
+      containers:
+        - name: miacademy-writemostly-maintenance
+          image: "registry.dev.miaplaza.com/infrastructure/postgresql:15-6-0-0"
+          imagePullPolicy: Always
+          command:
+            - "tail"
+            - "-f"
+            - "/dev/null"
+          volumeMounts:
+            - mountPath: /bitnami/postgresql
+              name: pgdata
+            - mountPath: /etc/pgbackrest/conf.d/
+              name: pgbackrest
+          env:    
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: miacademy-website-writemostly
+                  key: postgresql-password
+                  optional: false
+            - name: PGHOST
+              value: "miacademy-writemostly"
+            - name: PGUSER
+              value: "postgres"
+            - name: DBNAME
+              value: "miaplaza"
+            - name: PGBACKREST_REPO1_PATH
+              value: "/miaplaza-Production-miacademy-writemostly"
+          resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 250m
+              memory: 256Mi
