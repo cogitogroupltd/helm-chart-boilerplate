@@ -63,11 +63,69 @@ image:
       - name: infrastructure-nginx-registry
     envVars:
       standard:
+        - name: TZ
+          value: Europe/Berlin
         - name: MIA_RedisConnectionString
           value: "miacademy-redis-master,password=$(__REDIS_PASSWORD)"
         - name: MIA_MiddleMail__Client__RabbitMQ__ConnectionString
           value: "host=middlemail-rabbitmq.default;username=user;password=$(__MIDDLEMAIL_PASSWORD)"
+        - name: MIA_Regulator__Sections__content__Branch
+          value: production
+        - name: COMPlus_ThreadPool_ForceMinWorkerThreads
+          value: '0x400'
+        - name: MIA_Revision
+          value: df26fa4dfc
+        - name: GOOGLE_APPLICATION_CREDENTIALS
+          value: /etc/google-cloud-credentials/key
+        - name: ASPNETCORE_URLS
+          value: http://+:5000;http://+:9090
+        - name: ASPNETCORE_ENVIRONMENT
+          value: Production
+        - name: MIA_ENVIRONMENT
+          value: Production
+        - name: MIA_REF_SLUG
+          value: 11-6-0
+        - name: MIA_NAMESPACE
+          value: miaplaza
+        - name: MIA_ConnectionString
+          value: >-
+            pgsql://Server=10.1.0.7;Port=5433;Database=miaplaza;User
+            Id=postgres;Password=$(__MAIN_PASSWORD);Application
+            Name=miacademy;Command Timeout=600;Connection Idle
+            Lifetime=300;Pooling=true;Minimum Pool Size=0;Maximum Pool
+            Size=384;Convert Infinity DateTime=true;Max Auto Prepare=64
+        - name: MIA_WriteMostlyConnectionString
+          value: >-
+            pgsql://Server=10.1.0.7;Port=5433;Database=miaplaza;User
+            Id=postgres;Password=$(__WRITEMOSTLY_PASSWORD);Application
+            Name=miacademy;Command Timeout=600;Connection Idle
+            Lifetime=300;Pooling=true;Minimum Pool Size=0;Maximum Pool
+            Size=64;Convert Infinity DateTime=true;Max Auto Prepare=64
+        - name: MIA_SITE
+          value: Miacademy
+        - name: MIA_Domains__Scheme
+          value: https
+        - name: MIA_Domains__PrefixChildren
+        - name: MIA_Domains__PrefixParents
+          value: parents.
+        - name: MIA_RabbitMQHost
+          value: miacademy-rabbitmq
+        - name: MIA_RabbitMQUserName
+          value: miaplaza
       fromSecret:
+        - name: __MIDDLEMAIL_PASSWORD
+          secret:
+            name: middlemail-rabbitmq
+            key: rabbitmq-password
+        - name: MIA_RabbitMQPassword
+          secret:
+            name: miacademy-rabbitmq
+            key: rabbitmq-password
+        - name: MIA_FacebookPixel__ConversionAPIAccessToken
+          secret:
+            name: facebook-pixel
+            key: ConversionAPIAccessToken
+            isOptional: true
         - name: MIA_BraintreePrivateKey
           secret:
             name: braintree-production
@@ -76,6 +134,7 @@ image:
           secret:
             name: miacademy-website-google-analytics
             key: MeasurementAPISecret
+            optional: false
         - name: __REDIS_PASSWORD
           secret:
             name: miacademy-website-redis
