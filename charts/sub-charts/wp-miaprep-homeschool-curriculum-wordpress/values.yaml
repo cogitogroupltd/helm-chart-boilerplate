@@ -20,7 +20,7 @@ image:
       - name: ALLOW_EMPTY_PASSWORD
         value: "yes"
       - name: MARIADB_HOST
-        value: wp-miaprep-homeschool-curriculum-mariadb
+        value: miacademy-wp-miaprep-homeschool-curriculum-mariadb
       - name: MARIADB_PORT_NUMBER
         value: "3306"
       - name: WORDPRESS_DATABASE_NAME
@@ -40,7 +40,7 @@ image:
     fromSecret:
       - name: WORDPRESS_DATABASE_PASSWORD
         secret:
-          name: wp-miaprep-homeschool-curriculum-mariadb
+          name: miacademy-wp-miaprep-homeschool-curriculum-mariadb
           key: mariadb-password
       - name: WORDPRESS_PASSWORD
         secret:

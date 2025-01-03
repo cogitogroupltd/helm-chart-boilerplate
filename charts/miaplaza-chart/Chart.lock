@@ -1,18 +1,18 @@
 dependencies:
 - name: regulator
-  repository: file://../regulator
+  repository: file://../sub-charts/regulator
   version: 0.1.0
 - name: mariadb
   repository: https://charts.bitnami.com/bitnami
   version: 20.2.1
 - name: wp-careers-wordpress
-  repository: file://../wp-careers-wordpress
+  repository: file://../sub-charts/wp-careers-wordpress
   version: 0.1.0
 - name: mariadb
   repository: https://charts.bitnami.com/bitnami
   version: 20.2.1
 - name: wp-miaprep-homeschool-curriculum-wordpress
-  repository: file://../wp-miaprep-homeschool-curriculum-wordpress
+  repository: file://../sub-charts/wp-miaprep-homeschool-curriculum-wordpress
   version: 0.1.0
 - name: rabbitmq
   repository: https://charts.bitnami.com/bitnami
@@ -21,7 +21,7 @@ dependencies:
   repository: https://charts.bitnami.com/bitnami
   version: 20.6.1
 - name: miacademy-website
-  repository: file://../miacademy-website
+  repository: file://../sub-charts/miacademy-website
   version: 0.1.0
-digest: sha256:b08e1fb466bd00151eb7ac467f50fbace4d3eb01a6b310905c78efa5ea680df0
-generated: "2025-01-02T23:17:41.366486+02:00"
+digest: sha256:bea618cebaf3eea4a6c3472887564ac1e9921c60d10c074e90670a4d9d280569
+generated: "2025-01-03T10:49:11.81341+02:00"

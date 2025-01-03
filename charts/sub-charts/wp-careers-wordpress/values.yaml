@@ -20,7 +20,7 @@ image:
       - name: ALLOW_EMPTY_PASSWORD
         value: "yes"
       - name: MARIADB_HOST
-        value: wp-careers-mariadb
+        value: miacademy-wp-careers-mariadb
       - name: MARIADB_PORT_NUMBER
         value: "3306"
       - name: WORDPRESS_DATABASE_NAME
@@ -58,7 +58,7 @@ image:
     fromSecret:
       - name: WORDPRESS_DATABASE_PASSWORD
         secret:
-          name: wp-careers-mariadb
+          name: miacademy-wp-careers-mariadb
           key: mariadb-password
       - name: WORDPRESS_PASSWORD
         secret:

@@ -26,7 +26,7 @@ dependencies:
     repository: "file://../sub-charts/wp-miaprep-homeschool-curriculum-wordpress"
 
   - name: rabbitmq
-    alias: middlemail-rabbitmq
+    alias: rabbitmq
     version: 15.2.1
     repository: "https://charts.bitnami.com/bitnami"
 
