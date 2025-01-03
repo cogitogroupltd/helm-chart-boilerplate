@@ -1,0 +1,11 @@
+wp-careers-mariadb:
+  auth:
+    username: bn_wordpress
+    database: bitnami_wordpress
+    password: mypassword
+
+wp-miaprep-homeschool-curriculum-mariadb:
+  auth:
+    username: bn_wordpress
+    database: bitnami_wordpress
+    password: mypassword
