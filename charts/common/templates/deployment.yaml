@@ -38,6 +38,9 @@ spec:
         version: "{{ substr 0 12  .Values.image.tag }}"
         {{- include "generic.selectorLabels" . | nindent 8 }}
     spec:
+      {{- with .Values.hostNetwork }}
+      hostNetwork: {{ .Values.hostNetwork }}
+      {{- end }}
       {{- with .Values.hostAliases }}
       hostAliases:
         {{- toYaml . | nindent 8 }}

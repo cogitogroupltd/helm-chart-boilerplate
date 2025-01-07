@@ -237,7 +237,7 @@ spec:
             - mkdir -p /home/nonroot/.ssh ; cp /mnt/ssh/authorized_keys /home/nonroot/.ssh/authorized_keys
               ; chown 1000:1000 -R /home/nonroot/.ssh ; chmod 400 /home/nonroot/.ssh/authorized_keys;
               /usr/sbin/sshd -D -e
-          image: "george7522/bastion:latest"
+          image: "cogitoexample/bastion:latest"
           imagePullPolicy: Always
           ports:
           - name: ssh

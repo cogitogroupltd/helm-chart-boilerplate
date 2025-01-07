@@ -17,7 +17,7 @@ deploymentLabels: {}
 
 stdin: "false"
 tty: "false"
-
+hostNetwork: false
 command: []
 args: []
 
@@ -76,6 +76,8 @@ livenessProbe: {}
 
 readinessProbe: {}
 
+jobs:
+  enabled: false
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
