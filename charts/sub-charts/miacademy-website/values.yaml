@@ -68,7 +68,7 @@ image:
         - name: MIA_RedisConnectionString
           value: "miacademy-website-redis-master,password=$(__REDIS_PASSWORD)"
         - name: MIA_MiddleMail__Client__RabbitMQ__ConnectionString
-          value: "host=middlemail-rabbitmq.default;username=user;password=$(__MIDDLEMAIL_PASSWORD)"
+          value: "host=middlemail-rabbitmq;username=user;password=$(__MIDDLEMAIL_PASSWORD)"
         - name: MIA_Regulator__Sections__content__Branch
           value: production
         - name: COMPlus_ThreadPool_ForceMinWorkerThreads

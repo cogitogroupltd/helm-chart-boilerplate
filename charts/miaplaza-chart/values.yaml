@@ -84,6 +84,12 @@ wp-careers-mariadb:
     password: mypassword
     rootPassword: HELIUUgQFJ
 
+wp-careers-wordpress:
+  fullnameOverride: "wp-careers-wordpress"
+  mariadb:
+    auth:
+      existingSecret: miacademy-wp-careers-mariadb
+
 wp-miaprep-homeschool-curriculum-mariadb:
   auth:
     username: bn_wordpress
@@ -91,38 +97,17 @@ wp-miaprep-homeschool-curriculum-mariadb:
     password: mypassword
     rootPassword: krU82NJNQS
 
+wp-miaprep-homeschool-curriculum-wordpress:
+  fullnameOverride: "wp-miaprep-homeschool-curriculum-wordpress"
+  mariadb:
+    auth:
+      existingSecret: miacademy-wp-miaprep-homeschool-curriculum-mariadb
+
+rabbitmq:
+  auth:
+    username: miaplaza
+
 website-redis:
   global:
     redis:
         password: GeKDAvBsDE
-
-# miacademy-website:
-#   initContainers:
-#     - name: init-copy-config
-#       repository: busybox
-#       tag: "latest"
-#       pullPolicy: Always
-#       command: 
-#         - /bin/sh
-#         - -c
-#         - |
-#           cp /kestrel/regulator/config.json /writable-config/config.json
-#           chown 33:33 /writable-config/config.json
-#           chmod 600 /writable-config/config.json
-#           echo "Copied config.json"
-#       volumeMounts:
-#         - name: assets
-#           mountPath: /wwwroot
-#         - name: uploads
-#           mountPath: /kestrel/uploads
-#         - name: regulator
-#           mountPath: /kestrel/regulator
-#         - name: cache
-#           mountPath: /kestrel/cache
-#         - name: keys
-#           mountPath: /kestrel/keys
-#         - name: config-volume
-#           mountPath: /kestrel/regulator/config.json
-#           subPath: config.json
-#         - name: writable-config
-#           mountPath: /writable-config

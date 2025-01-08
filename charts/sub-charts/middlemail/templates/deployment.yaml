@@ -1,1 +1,94 @@
-{{- include "library-chart.deployment.tpl" . -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "middlemail.fullname" . }}
+  labels:
+    {{- include "middlemail.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "middlemail.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+    {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      labels:
+        {{- include "middlemail.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          {{- if .Values.image.pullPolicy }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- end }}
+          env:
+          {{- if .Values.smtp.enabled }}
+          - name: MiddleMail__Delivery__Smtp__Server
+            valueFrom:
+              secretKeyRef:
+                name: "{{ .Values.smtp.secret }}"
+                key: host
+          - name: MiddleMail__Delivery__Smtp__Port
+            valueFrom:
+              secretKeyRef:
+                name: "{{ .Values.smtp.secret }}"
+                key: port
+          - name: MiddleMail__Delivery__Smtp__Username
+            valueFrom:
+              secretKeyRef:
+                name: "{{ .Values.smtp.secret }}"
+                key: username
+          - name: MiddleMail__Delivery__Smtp__Password
+            valueFrom:
+              secretKeyRef:
+                name: "{{ .Values.smtp.secret }}"
+                key: password
+          {{- else }}
+          - name: DISABLE_SMTP
+            value: "true"
+          {{- end }}
+          - name: MiddleMail__Delivery__MimeMessage__MessageIdDomainPart
+            value: "{{ .Values.mime.domain }}"
+          - name: MiddleMail__ExponentialBackoff__Multiplicator
+            value: "{{ .Values.backoff.multiplicator }}"
+          - name: MiddleMail__Storage__ElasticSearch__Uri
+            value: {{ template "middlemail.elasticsearch.uri" . }}
+          - name: MiddleMail__Storage__ElasticSearch__Index
+            value: {{ .Values.elasticsearch.index }}
+          - name: MiddleMail__MessageSource__RabbitMQ__EasyNetQ__Password
+            valueFrom:
+              secretKeyRef:
+                name: {{ template "middlemail.easynetq.secret" . }}
+                key: rabbitmq-password
+          - name: MiddleMail__MessageSource__RabbitMQ__ConnectionString
+            value: {{ template "middlemail.easynetq.connectionstring" . }}password=$(MiddleMail__MessageSource__RabbitMQ__EasyNetQ__Password)
+          - name: MiddleMail__MessageSource__RabbitMQ__SubscriptionId
+            value: {{ include "middlemail.fullname" . }}
+          - name: REDIS_INSTANCE_NAME
+            value: {{ template "middlemail.redis.hostname" . }}
+          - name: REDIS_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: {{ template "middlemail.redis.secretName" . }}
+                key: {{ template "middlemail.redis.secretPasswordKey" . }}
+          - name: REDIS_CONFIGURATION
+            value: {{ template "middlemail.redis.hostname" . }},password=$(REDIS_PASSWORD)
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

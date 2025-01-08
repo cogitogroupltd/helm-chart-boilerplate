@@ -20,20 +20,20 @@ dependencies:
 - name: mariadb
   repository: https://charts.bitnami.com/bitnami
   version: 20.2.1
-- name: wp-careers-wordpress
-  repository: file://../sub-charts/wp-careers-wordpress
-  version: 0.1.0
+- name: wordpress
+  repository: https://charts.bitnami.com/bitnami
+  version: 24.1.5
 - name: mariadb
   repository: https://charts.bitnami.com/bitnami
   version: 20.2.1
-- name: wp-miaprep-homeschool-curriculum-wordpress
-  repository: file://../sub-charts/wp-miaprep-homeschool-curriculum-wordpress
-  version: 0.1.0
+- name: wordpress
+  repository: https://charts.bitnami.com/bitnami
+  version: 24.1.5
 - name: rabbitmq
   repository: https://charts.bitnami.com/bitnami
   version: 15.2.1
 - name: redis
   repository: https://charts.bitnami.com/bitnami
   version: 20.6.1
-digest: sha256:a5421da1c94e1994cecc2d981903d530c62e6268a253edb44abbddb2cccd628e
-generated: "2025-01-08T17:10:37.170634+02:00"
+digest: sha256:6724e307485e72333215bf37c145c3a955581e13402070a35ae7ae216aaec499
+generated: "2025-01-08T22:51:16.403406+02:00"
