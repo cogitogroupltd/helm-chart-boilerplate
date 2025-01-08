@@ -22,7 +22,7 @@ initContainers:
     pullPolicy: Always
     command: 
       - /bin/sh
-      - '-c'
+      - -c
       - |
         cp /kestrel/regulator/config.json /writable-config/config.json
         chown 33:33 /writable-config/config.json
@@ -66,7 +66,7 @@ image:
         - name: TZ
           value: Europe/Berlin
         - name: MIA_RedisConnectionString
-          value: "miacademy-redis-master,password=$(__REDIS_PASSWORD)"
+          value: "miacademy-website-redis-master,password=$(__REDIS_PASSWORD)"
         - name: MIA_MiddleMail__Client__RabbitMQ__ConnectionString
           value: "host=middlemail-rabbitmq.default;username=user;password=$(__MIDDLEMAIL_PASSWORD)"
         - name: MIA_Regulator__Sections__content__Branch
@@ -89,8 +89,8 @@ image:
           value: miaplaza
         - name: MIA_ConnectionString
           value: >-
-            pgsql://Server=10.1.0.7;Port=5433;Database=miaplaza;User
-            Id=postgres;Password=$(__MAIN_PASSWORD);Application
+            pgsql://Server=10.1.0.7;Port=5432;Database=miaplaza;User
+            Id=postgres_user;Password=$(__MAIN_PASSWORD);Application
             Name=miacademy;Command Timeout=600;Connection Idle
             Lifetime=300;Pooling=true;Minimum Pool Size=0;Maximum Pool
             Size=384;Convert Infinity DateTime=true;Max Auto Prepare=64
@@ -163,15 +163,15 @@ image:
       - name: metrics
         containerPort: 9090
         protocol: TCP
-    livenessProbe:
-      httpGet:
-        path: /health
-        port: http
-        scheme: HTTP
-      failureThreshold: 6
-      periodSeconds: 10
-      timeoutSeconds: 60
-      successThreshold: 1
+    # livenessProbe:
+    #   httpGet:
+    #     path: /health
+    #     port: http
+    #     scheme: HTTP
+    #   failureThreshold: 6
+    #   periodSeconds: 10
+    #   timeoutSeconds: 60
+    #   successThreshold: 1
     startupProbe:
       httpGet:
         path: /
@@ -202,7 +202,7 @@ image:
         mountPath: /kestrel/keys
       - name: google-cloud-credentials
         mountPath: /etc/google-cloud-credentials
-
+  
 volumeClaimTemplates:
   - name: keys
     spec:

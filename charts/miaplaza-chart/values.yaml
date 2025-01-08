@@ -1,11 +1,128 @@
+miacademy-main:
+  image:
+    registry: registry.dev.miaplaza.com
+    repository: infrastructure/postgresql
+    tag: "15-6-0-0"
+    pullSecrets:
+      - name: miaplaza-website-registry
+      - name: infrastructure-postgresql-registry
+      - name: infrastructure-nginx-registry
+  global:
+    security:
+      allowInsecureImages: true
+    postgresql:
+      auth:
+        database: "miaplaza"
+  fullnameOverride: "miacademy-main"
+  primary:
+    nodeSelector:
+      role: postgres
+  metrics:
+    enabled: true
+    image:
+      registry: docker.io
+      repository: bitnami/postgres-exporter
+      tag: 0.10.0-debian-10-r172
+    extendedConfiguration:
+      archive_command = 'pgbackrest --stanza=postgres archive-push %p'
+      archive_mode = 'on'
+      effective_cache_size = '18868MB'
+      jit = 'off'
+      maintenance_work_mem = '1024MB'
+      max_connections = 576
+      max_wal_senders = 3
+      random_page_cost = '0.7'
+      seq_page_cost = '0.5'
+      shared_buffers = '8938MB'
+      timezone = 'Europe/Berlin'
+      work_mem = '54MB'
+
+miacademy-writemostly:
+  image:
+    registry: registry.dev.miaplaza.com
+    repository: infrastructure/postgresql
+    tag: "15-6-0-0"
+    pullSecrets:
+      - name: miaplaza-website-registry
+      - name: infrastructure-postgresql-registry
+      - name: infrastructure-nginx-registry
+  global:
+    security:
+      allowInsecureImages: true
+    postgresql:
+      auth:
+        database: "miaplaza"
+  fullnameOverride: "miacademy-writemostly"
+  primary:
+    nodeSelector:
+      role: postgres
+  metrics:
+    enabled: true
+    image:
+      registry: docker.io
+      repository: bitnami/postgres-exporter
+      tag: 0.10.0-debian-10-r172
+    extendedConfiguration:
+      archive_command = 'pgbackrest --stanza=postgres archive-push %p'
+      archive_mode = 'on'
+      effective_cache_size = '18868MB'
+      jit = 'off'
+      maintenance_work_mem = '1024MB'
+      max_connections = 576
+      max_wal_senders = 3
+      random_page_cost = '0.7'
+      seq_page_cost = '0.5'
+      shared_buffers = '8938MB'
+      timezone = 'Europe/Berlin'
+      work_mem = '54MB'
+
+
 wp-careers-mariadb:
   auth:
     username: bn_wordpress
     database: bitnami_wordpress
     password: mypassword
+    rootPassword: HELIUUgQFJ
 
 wp-miaprep-homeschool-curriculum-mariadb:
   auth:
     username: bn_wordpress
     database: bitnami_wordpress
     password: mypassword
+    rootPassword: krU82NJNQS
+
+website-redis:
+  global:
+    redis:
+        password: GeKDAvBsDE
+
+# miacademy-website:
+#   initContainers:
+#     - name: init-copy-config
+#       repository: busybox
+#       tag: "latest"
+#       pullPolicy: Always
+#       command: 
+#         - /bin/sh
+#         - -c
+#         - |
+#           cp /kestrel/regulator/config.json /writable-config/config.json
+#           chown 33:33 /writable-config/config.json
+#           chmod 600 /writable-config/config.json
+#           echo "Copied config.json"
+#       volumeMounts:
+#         - name: assets
+#           mountPath: /wwwroot
+#         - name: uploads
+#           mountPath: /kestrel/uploads
+#         - name: regulator
+#           mountPath: /kestrel/regulator
+#         - name: cache
+#           mountPath: /kestrel/cache
+#         - name: keys
+#           mountPath: /kestrel/keys
+#         - name: config-volume
+#           mountPath: /kestrel/regulator/config.json
+#           subPath: config.json
+#         - name: writable-config
+#           mountPath: /writable-config

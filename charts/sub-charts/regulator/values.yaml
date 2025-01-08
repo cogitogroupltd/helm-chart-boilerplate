@@ -137,6 +137,15 @@ autoscaling:
   targetCPUUtilizationPercentage: 80
   # targetMemoryUtilizationPercentage: 80
 
+configmap:
+  enabled: true
+  data:
+    config.json: |
+      {
+        "key1": "value1",
+        "key2": "value2"
+      }
+
 # Additional volumes on the output Deployment definition.
 volumes: []
 # - name: foo

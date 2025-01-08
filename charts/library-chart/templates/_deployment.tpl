@@ -66,7 +66,6 @@ spec:
         {{- toYaml .Values.tolerations | nindent 8 }}
       {{- end }}
 {{- end -}}
-
 {{- end -}}
 
 {{- define "library-chart.deployment" -}}

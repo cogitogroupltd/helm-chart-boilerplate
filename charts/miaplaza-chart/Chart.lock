@@ -1,4 +1,19 @@
 dependencies:
+- name: postgresql
+  repository: https://charts.bitnami.com/bitnami
+  version: 16.3.5
+- name: miacademy-main-maintenance
+  repository: file://../sub-charts/miacademy-main-maintenance
+  version: 0.1.0
+- name: miacademy-website
+  repository: file://../sub-charts/miacademy-website
+  version: 0.2.0
+- name: postgresql
+  repository: https://charts.bitnami.com/bitnami
+  version: 16.3.5
+- name: miacademy-writemostly-maintenance
+  repository: file://../sub-charts/miacademy-writemostly-maintenance
+  version: 0.2.0
 - name: regulator
   repository: file://../sub-charts/regulator
   version: 0.1.0
@@ -20,8 +35,5 @@ dependencies:
 - name: redis
   repository: https://charts.bitnami.com/bitnami
   version: 20.6.1
-- name: miacademy-website
-  repository: file://../sub-charts/miacademy-website
-  version: 0.1.0
-digest: sha256:bea618cebaf3eea4a6c3472887564ac1e9921c60d10c074e90670a4d9d280569
-generated: "2025-01-03T10:49:11.81341+02:00"
+digest: sha256:a5421da1c94e1994cecc2d981903d530c62e6268a253edb44abbddb2cccd628e
+generated: "2025-01-08T17:10:37.170634+02:00"
