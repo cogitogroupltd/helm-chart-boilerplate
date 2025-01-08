@@ -1,5 +1,0 @@
-  auth:
-    username: bn_wordpress
-    database: bitnami_wordpress
-    password: mypassword
-    rootPassword: BczH9RYCiz

@@ -33,3 +33,4 @@ certs
 secret
 values-test.yaml
 backup
+archived-chart

@@ -1,5 +1,0 @@
-apiVersion: v2
-name: library-chart
-description: Helm library chart for miaplaza
-type: library
-version: 1.0.0
