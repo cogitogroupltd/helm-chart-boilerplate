@@ -34,3 +34,5 @@ secret
 values-test.yaml
 backup
 archived-chart
+values-don't-push.yaml
+.Ds_Store

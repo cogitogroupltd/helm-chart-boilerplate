@@ -1,0 +1,12 @@
+dependencies:
+- name: rabbitmq
+  repository: https://raw.githubusercontent.com/bitnami/charts/eb5f9a9513d987b519f0ecd732e7031241c50328/bitnami
+  version: 7.5.8
+- name: elasticsearch
+  repository: https://raw.githubusercontent.com/bitnami/charts/eb5f9a9513d987b519f0ecd732e7031241c50328/bitnami
+  version: 12.3.6
+- name: redis
+  repository: https://raw.githubusercontent.com/bitnami/charts/eb5f9a9513d987b519f0ecd732e7031241c50328/bitnami
+  version: 10.7.17
+digest: sha256:5615acec43e8784c11aff95fdddae92667c798df21a013c88a693fc748ef6fbb
+generated: "2023-10-12T15:23:47.917219829+02:00"

@@ -1,0 +1,359 @@
+# Default values for miacademy-website.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+type: statefulset
+# This will set the replicaset count more information can be found here: https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/
+replicaCount: 1
+serviceName: miacademy-website-headless
+podManagementPolicy: OrderedReady
+
+persistentVolumeClaimRetentionPolicy:
+  whenDeleted: Retain
+  whenScaled: Retain
+
+updateStrategy:
+  type: RollingUpdate
+# This sets the container image more information can be found here: https://kubernetes.io/docs/concepts/containers/images/
+
+initContainers:
+  - name: init-copy-config
+    repository: busybox
+    tag: "latest"
+    pullPolicy: Always
+    command: 
+      - /bin/sh
+      - -c
+      - |
+        cp /kestrel/regulator/config.json /writable-config/config.json
+        chown 33:33 /writable-config/config.json
+        chmod 600 /writable-config/config.json
+    volumeMounts:
+      - name: assets
+        mountPath: /wwwroot
+      - name: uploads
+        mountPath: /kestrel/uploads
+      - name: regulator
+        mountPath: /kestrel/regulator
+      - name: cache
+        mountPath: /kestrel/cache
+      - name: keys
+        mountPath: /kestrel/keys
+      - name: config-volume
+        mountPath: /kestrel/regulator/config.json
+        subPath: config.json
+      - name: writable-config
+        mountPath: /writable-config
+  - name: assets
+    repository: registry.dev.miaplaza.com/miaplaza/website/assets
+    tag: "11-6-0"
+    pullPolicy: Always
+    volumeMounts:
+      - name: assets
+        mountPath: /wwwroot
+image:
+    name: kestrel
+    repository: registry.dev.miaplaza.com/miaplaza/website/kestrel
+    # This sets the pull policy for images.
+    pullPolicy: Always
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: "11-6-0"
+    secrets: 
+      - name: miaplaza-website-registry
+      - name: infrastructure-postgresql-registry
+      - name: infrastructure-nginx-registry
+    envVars:
+      standard:
+        - name: TZ
+          value: Europe/Berlin
+        - name: MIA_RedisConnectionString
+          value: "miacademy-website-redis-master,password=$(__REDIS_PASSWORD)"
+        - name: MIA_MiddleMail__Client__RabbitMQ__ConnectionString
+          value: "host=middlemail-rabbitmq;username=user;password=$(__MIDDLEMAIL_PASSWORD)"
+        - name: MIA_Regulator__Sections__content__Branch
+          value: production
+        - name: COMPlus_ThreadPool_ForceMinWorkerThreads
+          value: '0x400'
+        - name: MIA_Revision
+          value: df26fa4dfc
+        - name: GOOGLE_APPLICATION_CREDENTIALS
+          value: /etc/google-cloud-credentials/key
+        - name: ASPNETCORE_URLS
+          value: http://+:5000;http://+:9090
+        - name: ASPNETCORE_ENVIRONMENT
+          value: Production
+        - name: MIA_ENVIRONMENT
+          value: Staging
+        - name: MIA_REF_SLUG
+          value: 11-6-0
+        - name: MIA_NAMESPACE
+          value: miaplaza
+        - name: MIA_ConnectionString
+          value: >-
+            pgsql://Server=10.1.0.7;Port=5432;Database=miaplaza;User
+            Id=postgres_user;Password=$(__MAIN_PASSWORD);Application
+            Name=miacademy;Command Timeout=600;Connection Idle
+            Lifetime=300;Pooling=true;Minimum Pool Size=0;Maximum Pool
+            Size=384;Convert Infinity DateTime=true;Max Auto Prepare=64
+        - name: MIA_WriteMostlyConnectionString
+          value: >-
+            pgsql://Server=10.1.0.7;Port=5433;Database=miaplaza;User
+            Id=postgres;Password=$(__WRITEMOSTLY_PASSWORD);Application
+            Name=miacademy;Command Timeout=600;Connection Idle
+            Lifetime=300;Pooling=true;Minimum Pool Size=0;Maximum Pool
+            Size=64;Convert Infinity DateTime=true;Max Auto Prepare=64
+        - name: MIA_SITE
+          value: Miacademy
+        - name: MIA_Domains__Scheme
+          value: https
+        - name: MIA_Domains__PrefixChildren
+        - name: MIA_Domains__PrefixParents
+          value: parents.
+        - name: MIA_RabbitMQHost
+          value: miacademy-rabbitmq
+        - name: MIA_RabbitMQUserName
+          value: miaplaza
+      fromSecret:
+        - name: __MIDDLEMAIL_PASSWORD
+          secret:
+            name: middlemail-rabbitmq
+            key: rabbitmq-password
+        - name: MIA_RabbitMQPassword
+          secret:
+            name: miacademy-rabbitmq
+            key: rabbitmq-password
+        - name: MIA_FacebookPixel__ConversionAPIAccessToken
+          secret:
+            name: facebook-pixel
+            key: ConversionAPIAccessToken
+            isOptional: true
+        - name: MIA_BraintreePrivateKey
+          secret:
+            name: braintree-production
+            key: BraintreePrivateKey
+        - name: MIA_GoogleAnalytics__MeasurementAPISecret
+          secret:
+            name: miacademy-website-google-analytics
+            key: MeasurementAPISecret
+            optional: false
+        - name: __REDIS_PASSWORD
+          secret:
+            name: miacademy-website-redis
+            key: redis-password
+        - name: __MAIN_PASSWORD
+          secret:
+            name: miacademy-website-main
+            key: postgresql-password
+        - name: __WRITEMOSTLY_PASSWORD
+          secret:
+            name: miacademy-website-writemostly
+            key: postgresql-password
+        - name: AWS_ACCESS_KEY_ID
+          secret:
+            name: aws
+            key: access-key-id
+        - name: AWS_SECRET_ACCESS_KEY
+          secret:
+            name: aws
+            key: secret-access-key
+
+    ports:
+      - name: http
+        containerPort: 5000
+        protocol: TCP
+      - name: metrics
+        containerPort: 9090
+        protocol: TCP
+    # livenessProbe:
+    #   httpGet:
+    #     path: /health
+    #     port: http
+    #     scheme: HTTP
+    #   failureThreshold: 6
+    #   periodSeconds: 10
+    #   timeoutSeconds: 60
+    #   successThreshold: 1
+    startupProbe:
+      httpGet:
+        path: /
+        port: http
+        scheme: HTTP
+      failureThreshold: 20
+      periodSeconds: 10
+      timeoutSeconds: 600
+      successThreshold: 1
+
+    securityContext:
+      capabilities:
+        add:
+          - SYS_PTRACE
+      runAsUser: 33
+      runAsGroup: 33
+    volumeMounts:
+      - name: assets
+        mountPath: /wwwroot
+        readOnly: true
+      - name: uploads
+        mountPath: /kestrel/uploads
+      - name: regulator
+        mountPath: /kestrel/regulator
+      - name: cache
+        mountPath: /kestrel/cache
+      - name: keys
+        mountPath: /kestrel/keys
+      - name: google-cloud-credentials
+        mountPath: /etc/google-cloud-credentials
+  
+volumeClaimTemplates:
+  - name: keys
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 50Mi
+      volumeMode: Filesystem
+  - name: uploads
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 512Gi
+      volumeMode: Filesystem
+  - name: regulator
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 1Gi
+      volumeMode: Filesystem
+
+# This is for the secretes for pulling an image from a private repository more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+imagePullSecrets: []
+# This is to override the chart name.
+nameOverride: ""
+fullnameOverride: "miacademy-website"
+
+# This section builds out the service account more information can be found here: https://kubernetes.io/docs/concepts/security/service-accounts/
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Automatically mount a ServiceAccount's API credentials?
+  automount: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+# This is for setting Kubernetes Annotations to a Pod.
+# For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+podAnnotations: {}
+# This is for setting Kubernetes Labels to a Pod.
+# For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
+podLabels: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext:
+    runAsUser: 33
+    runAsGroup: 33
+    fsGroup: 33
+# securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+# This is for setting up a service more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/
+service:
+  name: "http"
+  # This sets the service type more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types
+  type: ClusterIP
+  # This sets the ports more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/#field-spec-ports
+  port: 80
+  protocol: "TCP"
+  targetPort: "http"
+
+# This block is for setting up the ingress for more information can be found here: https://kubernetes.io/docs/concepts/services-networking/ingress/
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations: 
+    kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: app.load-testing.miaplaza.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+# This is to setup the liveness and readiness probes more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
+livenessProbe:
+  httpGet:
+    path: /
+    port: http
+readinessProbe:
+  httpGet:
+    path: /
+    port: http
+
+# This section is for setting up autoscaling more information can be found here: https://kubernetes.io/docs/concepts/workloads/autoscaling/
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+# Additional volumes on the output Deployment definition.
+volumes: 
+  - name: writable-config
+    emptyDir: {}
+  - name: config-volume
+    configMap:
+      name: regulator-config
+      items:
+        - key: config.json
+          path: config.json
+      defaultMode: 420
+  - name: assets
+    emptyDir: {}
+  - name: cache
+    emptyDir: {}
+  - name: google-cloud-credentials
+    secret:
+      secretName: google-service-account-key-kestrel
+      defaultMode: 420
+
+# Additional volumeMounts on the output Deployment definition.
+volumeMounts: []
+# - name: foo
+#   mountPath: "/etc/foo"
+#   readOnly: true
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

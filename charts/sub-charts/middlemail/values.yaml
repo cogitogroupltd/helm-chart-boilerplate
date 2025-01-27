@@ -1,0 +1,95 @@
+# MiddleMail Docker image
+# ref: https://hub.docker.com/r/miaplaza/middlemail/tags
+image:
+  repository: miaplaza/middlemail
+  # Defaults to 'Always' if image tag is 'latest', else to 'IfNotPresent'
+  # pullPolicy: Always
+
+replicaCount: 1
+# fullnameOverride: "middlemail"
+rabbitmq:
+  provision: true
+
+  # When these are not set, this chart is going to deploy its own RabbitMQ instance and connect to it.
+  # It will then be accessible in your cluster as the service RELEASE-rabbitmq-0
+  # provision: false
+  # host: localhost
+  # port: 5673
+
+  auth:
+    username: user
+    # existingErlangSecret: miacademy-rabbitmq
+    # existingPasswordSecret: miacademy-rabbitmq
+    # TODO: Assert that this is set if persistence.enabled :(
+    # existingPasswordSecret: RELEASE-rabbitmq
+    # existingErlangSecret: RELEASE-rabbitmq
+    # existingPasswordSecret: a secret containing rabbitmq-password
+
+
+  # Install DelayedMessageExchange plugin into a provided rabbitmq
+
+  initContainers:
+    - name: download-delayed-message-exchange
+      image: bitnami/rabbitmq:3.8.5
+      command: ['sh', '-c', 'curl -L --output /plugins/rabbitmq_delayed_message_exchange-3.8.0.ez https://github.com/rabbitmq/rabbitmq-delayed-message-exchange/releases/download/v3.8.0/rabbitmq_delayed_message_exchange-3.8.0.ez && cp /opt/bitnami/rabbitmq/plugins/* /plugins']
+      volumeMounts:
+      - name: plugins
+        mountPath: /plugins
+  extraVolumes:
+    - name: plugins
+  extraVolumeMounts:
+    - name: plugins
+      mountPath: /opt/bitnami/rabbitmq/plugins
+
+  # We run a specific tag of RabbitMQ just to make sure that we copy the plugins from the correct version.
+  image.tag: 3.8.5
+
+  extraPlugins: rabbitmq_delayed_message_exchange
+
+easynetq:
+  # Connection String parameters, see
+  # https://github.com/EasyNetQ/EasyNetQ/wiki/Connecting-to-RabbitMQ
+  prefetchCount: 10
+  product: MiddleMail
+  
+  # These can also be set to deviate from their defaults:
+  # virtualHost: /
+  # requestedHeartbeat: 10
+  # publisherConfirms: 10
+  # persistentMessages: true
+
+elasticsearch:
+  provision: false
+
+  # When this is not set, this chart is going to deploy its own Elasticsearch instance and connect to it.
+  # provision: false
+  uri: http://10.123.1.251:9200
+
+  # The Elasticsearch index to write to
+  index: email-production
+
+
+# Any parameters set here will be passed on to the bundled redis instance.
+redis: 
+  cluster:
+    enabled: false
+  existingSecret: middlemail-redis
+  # TODO: Assert that this is set when persistence.enabled :(
+  # existingSecret:
+
+smtp:
+  # Whether to actually send out mails through SMTP
+  enabled: true
+  # Name of a secret that holds SMTP credentials, i.e.,
+  # host, port, username, password
+  secret: middlemail-smtp
+
+mime:
+  # Domain part of the MIME multipart delimiters as in random-id@domain.
+  domain: mail.miaplaza.com
+
+backoff:
+  # When processing fails, a message is retried with an exponential backoff,
+  # starting at multiplicator many seconds, then 2*multiplicator seconds, then
+  # 4*multiplicator seconds, ...
+  multiplicator: 60

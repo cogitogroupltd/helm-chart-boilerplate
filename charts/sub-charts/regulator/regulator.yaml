@@ -1,0 +1,106 @@
+---
+# Source: regulator/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: test
+  name: regulator"
+  labels:
+    helm.sh/chart: regulator-0.1.0
+    app.kubernetes.io/name: regulator
+    app.kubernetes.io/instance: regulator-test
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+    
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 5000
+      protocol: TCP
+      name: http
+  selector:
+    app.kubernetes.io/name: regulator
+    app.kubernetes.io/instance: regulator-test
+---
+# Source: regulator/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name : regulator"
+  annotations:
+    
+    {}
+  labels:
+    helm.sh/chart: regulator-0.1.0
+    app.kubernetes.io/name: regulator
+    app.kubernetes.io/instance: regulator-test
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+    
+  namespace: test
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: regulator
+      app.kubernetes.io/instance: regulator-test
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        helm.sh/chart: regulator-0.1.0
+        app.kubernetes.io/name: regulator
+        app.kubernetes.io/instance: regulator-test
+        app.kubernetes.io/version: "1.16.0"
+        app.kubernetes.io/managed-by: Helm
+        
+      annotations:
+        
+        {}
+    spec:
+      automountServiceAccountToken: true
+      imagePullSecrets:
+        - name: miaplaza-regulator-registry
+      containers:
+        - name: regulator
+          image: "registry.dev.miaplaza.com/miaplaza/regulator:1-6-0"
+          imagePullPolicy: IfNotPresent
+          env:    
+            - name: MIA_GitLab__Projects__Config__AccessToken
+              valueFrom:
+                secretKeyRef:
+                  name: regulator
+                  key: config-access-token
+                  optional: false
+            - name: MIA_GitLab__Projects__Content__AccessToken
+              valueFrom:
+                secretKeyRef:
+                  name: regulator
+                  key: content-access-token
+                  optional: false
+            - name: MIA_GitLab__Projects__I18n__AccessToken
+              valueFrom:
+                secretKeyRef:
+                  name: regulator
+                  key: i18n-access-token
+                  optional: false
+            - name: MIA_GitLab__HostUrl
+              value: "https://dev.miaplaza.com"
+            - name: MIA_GitLab__Projects__Config__Id
+              value: "350"
+            - name: MIA_GitLab__Projects__Content__Id
+              value: "351"
+            - name: MIA_GitLab__Projects__I18n__Id
+              value: "352"
+          resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 100m
+              memory: 256Mi

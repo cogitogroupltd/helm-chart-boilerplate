@@ -1,0 +1,16 @@
+
+# Add your values here
+
+
+
+secrets:
+
+  - name: my-secret
+
+    type: Opaque
+
+    data:
+
+      key1: value1
+
+      key2: value2

@@ -1,0 +1,163 @@
+miacademy-main:
+  image:
+    registry: registry.dev.miaplaza.com
+    repository: infrastructure/postgresql
+    tag: "15-6-0-0"
+    pullSecrets:
+      - name: miaplaza-website-registry
+      - name: infrastructure-postgresql-registry
+      - name: infrastructure-nginx-registry
+  global:
+    security:
+      allowInsecureImages: true
+    postgresql:
+      auth:
+        database: "miaplaza"
+  fullnameOverride: "miacademy-main"
+  primary:
+    nodeSelector:
+      role: postgres
+  metrics:
+    enabled: true
+    image:
+      registry: docker.io
+      repository: bitnami/postgres-exporter
+      tag: 0.10.0-debian-10-r172
+    extendedConfiguration:
+      archive_command = 'pgbackrest --stanza=postgres archive-push %p'
+      archive_mode = 'on'
+      effective_cache_size = '18868MB'
+      jit = 'off'
+      maintenance_work_mem = '1024MB'
+      max_connections = 576
+      max_wal_senders = 3
+      random_page_cost = '0.7'
+      seq_page_cost = '0.5'
+      shared_buffers = '8938MB'
+      timezone = 'Europe/Berlin'
+      work_mem = '54MB'
+
+miacademy-main-maintenance:
+  secrets:
+    - name: load-testing-pgbackrest
+      type: Opaque
+      data:
+        s3.conf: |
+          [global]
+          repo1-cipher-type=aes-256-cbc
+          repo1-cipher-pass=example-passphrase
+          repo1-type=s3
+          repo1-retention-full=7
+          repo1-retention-full-type=day
+          repo1-s3-bucket=my-dummy-backup-bucket
+          repo1-s3-endpoint=s3.amazonaws.com
+          repo1-s3-region=us-east-1
+          repo1-s3-key=AKIAXXXXXXEXAMPLE
+          repo1-s3-key-secret=abc123xyzEXAMPLESECRETKEY
+  volumes: 
+    - name: pgdata
+      persistentVolumeClaim:
+        claimName: data-miacademy-main-0
+    - name: pgbackrest
+      secret:
+        defaultMode: 420
+        secretName: load-testing-pgbackrest
+
+miacademy-website:
+  # This block is for setting up the ingress for more information can be found here: https://kubernetes.io/docs/concepts/services-networking/ingress/
+  ingress:
+    enabled: true
+    className: "nginx"
+    annotations: 
+      kubernetes.io/ingress.class: nginx
+      # kubernetes.io/tls-acme: "true"
+    hosts:
+      - host: miacademy.load-testing.miaplaza.co
+        paths:
+          - path: /
+            pathType: Prefix
+
+
+miacademy-writemostly:
+  image:
+    registry: registry.dev.miaplaza.com
+    repository: infrastructure/postgresql
+    tag: "15-6-0-0"
+    pullSecrets:
+      - name: miaplaza-website-registry
+      - name: infrastructure-postgresql-registry
+      - name: infrastructure-nginx-registry
+  global:
+    security:
+      allowInsecureImages: true
+    postgresql:
+      auth:
+        database: "miaplaza"
+  fullnameOverride: "miacademy-writemostly"
+  primary:
+    nodeSelector:
+      role: postgres
+  metrics:
+    enabled: true
+    image:
+      registry: docker.io
+      repository: bitnami/postgres-exporter
+      tag: 0.10.0-debian-10-r172
+    extendedConfiguration:
+      archive_command = 'pgbackrest --stanza=postgres archive-push %p'
+      archive_mode = 'on'
+      effective_cache_size = '18868MB'
+      jit = 'off'
+      maintenance_work_mem = '1024MB'
+      max_connections = 576
+      max_wal_senders = 3
+      random_page_cost = '0.7'
+      seq_page_cost = '0.5'
+      shared_buffers = '8938MB'
+      timezone = 'Europe/Berlin'
+      work_mem = '54MB'
+
+miacademy-writemostly-maintenance:
+  volumes: 
+    - name: pgdata
+      persistentVolumeClaim:
+        claimName: data-miacademy-writemostly-0
+    - name: pgbackrest
+      secret:
+        defaultMode: 420
+        secretName: load-testing-pgbackrest
+
+wp-careers-mariadb:
+  auth:
+    username: bn_wordpress
+    database: bitnami_wordpress
+    password: <Your Password>
+    rootPassword: <Your Root Password>
+
+wp-careers-wordpress:
+  fullnameOverride: "wp-careers-wordpress"
+  mariadb:
+    auth:
+      existingSecret: miacademy-wp-careers-mariadb
+
+wp-miaprep-homeschool-curriculum-mariadb:
+  auth:
+    username: bn_wordpress
+    database: bitnami_wordpress
+    password: <Your Password>
+    rootPassword: <Your Root Password>
+
+wp-miaprep-homeschool-curriculum-wordpress:
+  fullnameOverride: "wp-miaprep-homeschool-curriculum-wordpress"
+  mariadb:
+    auth:
+      existingSecret: miacademy-wp-miaprep-homeschool-curriculum-mariadb
+
+rabbitmq:
+  auth:
+    username: miaplaza
+
+website-redis:
+  global:
+    redis:
+        password: GeKDAvBsDE
