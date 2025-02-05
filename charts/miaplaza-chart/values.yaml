@@ -70,9 +70,29 @@ miacademy-website:
     className: "nginx"
     annotations: 
       kubernetes.io/ingress.class: nginx
-      # kubernetes.io/tls-acme: "true"
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+      nginx.ingress.kubernetes.io/proxy-ssl-secret: miaplaza/miacademy-tls-secret
+    tls:
+      - hosts:
+          - miacademy.load-testing.miacademy.co
+          - parents.miacademy.load-testing.miacademy.co
+          - www.miacademy.load-testing.miacademy.co
+          - www.parents.miacademy.load-testing.miacademy.co
+        secretName: miacademy-tls-secret
     hosts:
-      - host: miacademy.load-testing.miaplaza.co
+      - host: miacademy.load-testing.miacademy.co
+        paths:
+          - path: /
+            pathType: Prefix
+      - host: parents.miacademy.load-testing.miacademy.co
+        paths:
+          - path: /
+            pathType: Prefix
+      - host: www.miacademy.load-testing.miacademy.co
+        paths:
+          - path: /
+            pathType: Prefix
+      - host: www.parents.miacademy.load-testing.miacademy.co
         paths:
           - path: /
             pathType: Prefix
