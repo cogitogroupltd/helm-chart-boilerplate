@@ -226,6 +226,10 @@ initContainers:
   # extraVolumes: []
   # extraVolumeMounts: []
 
+# To force a rollout, set the timestamp to the current time
+rollout:
+  restart:
+    timestamp: ""
 
 # Orleans requires environment configurations
 orleans:
