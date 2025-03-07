@@ -30,6 +30,7 @@ spec:
       annotations:
         co.elastic.logs.{{ include "generic.fullname" . }}-service/enabled: "true"
         checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        rollme: "{{ .Values.rollout.restart.timestamp }}"
       {{- with .Values.podAnnotations }}
         {{- toYaml . | nindent 8 }}
       {{- end }}
