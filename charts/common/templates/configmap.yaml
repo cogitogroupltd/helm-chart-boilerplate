@@ -7,11 +7,13 @@ metadata:
   labels:
     {{- include "generic.labels" $ | nindent 4 }}
 data:
-{{- if .Values.configMap.files }}
 {{- range $key, $value := .Values.configMap.files }}
+  {{- if typeIs "string" $value }}
   {{ $key }}: |-
 {{ $value | indent 4 }}
-{{ "" | indent 0 }}
-{{- end -}}
-{{- end -}}
+  {{- else }}
+  {{ $key }}: |-
+{{ $value | toYaml | indent 4 }}
+  {{- end }}
+{{- end }}
 {{- end -}}
