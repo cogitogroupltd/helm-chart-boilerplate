@@ -1,0 +1,18 @@
+# Artifact Hub repository metadata file
+# https://github.com/artifacthub/hub/blob/master/docs/metadata/artifacthub-repo.yml
+repositoryID: helm-chart-boilerplate-cogito
+owners:
+  - name: Cogito Group Ltd
+    email: info@cogitogroup.co.uk
+
+# Repository display name
+displayName: Universal Helm Chart Boilerplate by Cogito Group
+
+# Links
+links:
+  - name: support
+    url: https://github.com/cogitogroupltd/helm-chart-boilerplate/issues
+  - name: Documentation
+    url: https://github.com/cogitogroupltd/helm-chart-boilerplate/tree/main/docs
+  - name: Examples
+    url: https://github.com/cogitogroupltd/helm-chart-boilerplate/tree/main/examples

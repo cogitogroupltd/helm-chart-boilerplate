@@ -2,13 +2,32 @@ apiVersion: v1
 entries:
   app:
   - apiVersion: v2
-    appVersion: 1.16.0
-    created: "2022-11-11T14:14:52.730622Z"
-    description: Helm chart to deploy a standard service
+    appVersion: 1.0.0
+    created: "2024-01-29T11:00:00.000000Z"
+    description: Universal Kubernetes Helm Chart Boilerplate - Deploy any application to Kubernetes with a single values file. Cloud-agnostic, production-ready chart with ConfigMaps, Secrets, HPA, and PersistentVolumes
     digest: 609bd7847d4e98d2d3069f38e16df9e2978c43d8cb33e5636107a58c7c5984d8
     name: app
     type: application
     urls:
     - https://cogitogroupltd.github.io/helm-chart-boilerplate/app-0.5.1.tgz
-    version: 0.5.1
-generated: "2022-11-11T14:14:52.729813Z"
+    version: 0.5.2
+    keywords:
+      - helm
+      - helm-chart
+      - kubernetes
+      - boilerplate
+      - template
+      - cloud-native
+      - devops
+      - microservices
+      - configmap
+      - secrets
+      - hpa
+      - autoscaling
+    home: https://github.com/cogitogroupltd/helm-chart-boilerplate
+    sources:
+      - https://github.com/cogitogroupltd/helm-chart-boilerplate
+    maintainers:
+      - name: Cogito Group Ltd
+        url: https://cogitogroup.co.uk
+generated: "2024-01-29T11:00:00.000000Z"

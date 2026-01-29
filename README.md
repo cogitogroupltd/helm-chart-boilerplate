@@ -1,30 +1,56 @@
-# Cloud agnostic Kubernetes Helm charts
+# Universal Helm Chart Boilerplate for Kubernetes
 
-[Cogito Group's](https://cogitogroup.co.uk) cloud agnostic and generic Helm charts to help businesses securely scale with minimal DevOps overheads. 
+[![Helm Chart](https://img.shields.io/badge/Helm-Chart-0f1689?logo=helm)](https://cogitogroupltd.github.io/helm-chart-boilerplate)
+[![Kubernetes](https://img.shields.io/badge/Kubernetes-Deployment-326CE5?logo=kubernetes)](https://kubernetes.io)
+[![License](https://img.shields.io/github/license/cogitogroupltd/helm-chart-boilerplate)](LICENSE)
 
-Source repository https://github.com/cogitogroupltd/helm-chart-boilerplate
+**Production-Ready Universal Kubernetes Helm Chart Template**
 
-- [ingress-nginx](./charts/ingress-nginx/README.md) Kubernetes Nginx ingress controller using pure Nginx for deploying to all environments, local, on-premise and/or cloud
-- [common](./charts/common/README.md) Kubernetes Generic Helm Chart for deploying all applications with a single parameter file using a single Helm chart
+Deploy any application to Kubernetes with a single values file using this universal Helm chart boilerplate from [Cogito Group Ltd](https://cogitogroup.co.uk). Eliminate the need to write custom Helm charts for every microservice.
 
+> Copyright [2024] [Cogito Group Ltd]
 
-Table of contents:
+## Why Use This Helm Chart Boilerplate?
+
+This **Universal Helm Chart Boilerplate** provides a comprehensive, reusable Helm chart template for deploying any application to Kubernetes:
+
+- **One Chart, All Applications**: Deploy any microservice using a single Helm chart with different values files
+- **Cloud Agnostic**: Works on EKS, AKS, GKE, OpenShift, K3s, MicroK8s, Kind, and bare metal
+- **Production Ready**: Built-in support for ConfigMaps, Secrets, HPA, PersistentVolumes, and more
+- **Developer Friendly**: Simple values.yaml configuration - no Helm chart expertise required
+- **Enterprise Features**: Secrets management, autoscaling, health checks, and Helm hooks
+- **Extensible**: RawYAML injection for custom Kubernetes resources
+
+**Repository**: https://github.com/cogitogroupltd/helm-chart-boilerplate
+**Helm Repository**: https://cogitogroupltd.github.io/helm-chart-boilerplate
+
+## Quick Start - Deploy Applications with Helm Boilerplate
+
+```bash
+# Add the Helm Chart Boilerplate repository
+helm repo add helm-boilerplate https://cogitogroupltd.github.io/helm-chart-boilerplate
+helm repo update helm-boilerplate
+
+# Deploy your application using the common chart
+helm install my-app helm-boilerplate/app --values your-values.yaml
+```
+
+## Table of Contents
 
 <!-- vscode-markdown-toc -->
-* 1. [Ingress-nginx](#Ingress-nginx)
-	* 1.1. [Example - Ingress-nginx with custom conf.d file injection](#Example-Ingress-nginxwithcustomconf.dfileinjection)
-	* 1.2. [Example - Ingress-nginx using 80/443 HostPorts](#Example-Ingress-nginxusing80443HostPorts)
-	* 1.3. [Example - Ingress-nginx using NodePorts with self-signed SSL certificate termination](#Example-Ingress-nginxusingNodePortswithself-signedSSLcertificatetermination)
-	* 1.4. [Example - Ingress-nginx using 3306 HostPort for mysql TCP backend](#Example-Ingress-nginxusing3306HostPortformysqlTCPbackend)
-	* 1.5. [Example - Ingress-nginx AWS NLB with NodePorts and IP whitelisting](#Example-Ingress-nginxAWSNLBwithNodePortsandIPwhitelisting)
-* 2. [Common](#Common)
-	* 2.1. [Example - Helm Chart for SSH bastion server](#Example-HelmChartforSSHbastionserver)
-	* 2.2. [Example - Autoscaling backend service](#Example-Autoscalingbackendservice)
-	* 2.3. [Example - Complete deployment of full common features](#Example-Completedeploymentoffullcommonfeatures)
-	* 2.4. [Example - Simple NodeJS express server with rawYaml injection](#Example-SimpleNodeJSexpressserverwithrawYamlinjection)
-	* 2.5. [Example - Helm Chart for Orleans Kubernetes application](#Example-HelmChartforOrleansKubernetesapplication)
-	* 2.6. [Example - Simple Nginx with static file mounts](#Example-SimpleNginxwithstaticfilemounts)
-	* 2.7. [Example - Tekton helm chart](#Example-Tektonhelmchart)
+* 1. [Key Features](#KeyFeatures)
+* 2. [Platform Compatibility](#PlatformCompatibility)
+* 3. [Helm Chart Boilerplate Features](#HelmChartBoilerplateFeatures)
+* 4. [Installation Examples](#InstallationExamples)
+	* 4.1. [Example - SSH Bastion Server Deployment](#Example-SSHBastionServerDeployment)
+	* 4.2. [Example - Autoscaling Backend Service](#Example-AutoscalingBackendService)
+	* 4.3. [Example - Complete Feature Demonstration](#Example-CompleteFeatureDemonstration)
+	* 4.4. [Example - NodeJS Express Application](#Example-NodeJSExpressApplication)
+	* 4.5. [Example - Orleans Kubernetes Application](#Example-OrleansKubernetesApplication)
+	* 4.6. [Example - Static Nginx File Server](#Example-StaticNginxFileServer)
+* 5. [Configuration](#Configuration)
+* 6. [Contributing](#Contributing)
+* 7. [Support](#Support)
 
 <!-- vscode-markdown-toc-config
 	numbering=true
@@ -32,284 +58,288 @@ Table of contents:
 	/vscode-markdown-toc-config -->
 <!-- /vscode-markdown-toc -->
 
+##  1. <a name='KeyFeatures'></a>Key Features of Universal Helm Chart Boilerplate
 
-##  1. <a name='Ingress-nginx'></a>Ingress-nginx 
+This Kubernetes Helm chart boilerplate provides everything needed for production deployments:
 
-Features:
-- Uses pure native Nginx configuration 
-- WebSocket, SSL and TCP streaming backend support
-- Healthcheck endpoint for Kubernetes lifecycle management
-- Custom [40x.html](./charts/ingress-nginx/templates/configmap-conf.yaml) and [50x](./charts/ingress-nginx/templates/configmap-conf.yaml) error pages 
-- Basic username/password authentication for each proxied application
-- IP Whitelisting for each proxied application
-- Zero-downtime upgrades using preStop hook `SIGQUIT` signal
-- Cloud agnostic deployment exposing `HostPort` or `NodePort`
+### Configuration Management
+- **ConfigMap Environment Variables**: Inject configuration via `.Values.configenv`
+- **ConfigMap Files**: Mount configuration files inline via `.Values.configMap.files`
+- **Secret Environment Variables**: Secure credentials via `.Values.secenv`
+- **Secret Files**: Mount sensitive files inline via `.Values.secret.files`
+- **External Secrets**: Integration with external secret managers
 
-See [values.yaml](./charts/ingress-nginx/values.yaml) for full list of features
+### Kubernetes Resources
+- **Deployments**: Standard Kubernetes deployment with full customization
+- **Services**: Multiple service definitions via `.Values.services`
+- **Ingress**: Kubernetes ingress resource configuration
+- **PersistentVolumes**: Automatic PV/PVC creation via `.Values.persistence`
+- **Jobs**: Kubernetes jobs and CronJobs support
+- **RawYAML Injection**: Include any custom Kubernetes YAML
 
-See `raw-yaml-output` directories for example outputted Kubernetes YAML 
+### Advanced Features
+- **Horizontal Pod Autoscaler (HPA)**: Automatic scaling based on CPU/memory
+- **InitContainers**: Pre-deployment initialization via `.Values.initContainers`
+- **Sidecar Containers**: Redis sidecar support via `.Values.RedisSidecar`
+- **Helm Hooks**: Pre/post install/upgrade hooks via `.Values.hook`
+- **Health Checks**: Liveness and readiness probes
+- **Resource Limits**: CPU and memory limits/requests
 
-Successfully tested on:
- - AWS EKS using NLB and ALB
- - Kind [download](https://kind.sigs.k8s.io/)
- - Rancher K3s 
- - Google Kubernetes Engine (GKE)
+### Security Features
+- **Service Accounts**: Kubernetes RBAC integration
+- **Role-Based Access**: Orleans and other RBAC configurations
+- **Secret Management**: Encrypted secret storage
+- **Network Policies**: (via rawYAML injection)
 
+See [values.yaml](./charts/common/values.yaml) for complete configuration options.
 
-###  1.1. <a name='Example-Ingress-nginxwithcustomconf.dfileinjection'></a>Example - Ingress-nginx with custom conf.d file injection
+##  2. <a name='PlatformCompatibility'></a>Platform Compatibility - Tested Kubernetes Environments
 
-See [example-raw-output.yaml](./examples/ingress-nginx-confd/example-raw-output.yaml) for example files outputted by helm templating.
+This Universal Helm Chart Boilerplate has been successfully tested on:
+
+- **AWS EKS**: Elastic Kubernetes Service
+- **Azure AKS**: Azure Kubernetes Service
+- **Google GKE**: Google Kubernetes Engine
+- **OpenShift**: ROSA and OKD distributions
+- **Rancher K3s**: Lightweight Kubernetes
+- **MicroK8s**: Canonical's minimal Kubernetes
+- **Kind**: Kubernetes in Docker for local development
+- **Bare Metal**: On-premise Kubernetes clusters
+
+##  3. <a name='HelmChartBoilerplateFeatures'></a>Helm Chart Boilerplate Features
+
+This universal Helm chart boilerplate eliminates the need to write custom charts for each application. Instead, define everything in a `values.yaml` file:
+
+```yaml
+# Example values.yaml for deploying any application
+replicaCount: 3
+
+image:
+  repository: myregistry/myapp
+  tag: "1.0.0"
+  pullPolicy: IfNotPresent
+
+# Environment variables from ConfigMap
+configenv:
+  LOG_LEVEL: "info"
+  API_URL: "https://api.example.com"
+
+# Secret environment variables
+secenv:
+  DATABASE_PASSWORD: "mysecretpassword"
+  API_KEY: "secretapikey"
+
+# Service configuration
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8080
+
+# Horizontal Pod Autoscaler
+hpa:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+
+# Persistent storage
+persistence:
+  enabled: true
+  size: 10Gi
+  mountPath: /data
+```
+
+##  4. <a name='InstallationExamples'></a>Installation Examples - Helm Chart Boilerplate Deployments
+
+###  4.1. <a name='Example-SSHBastionServerDeployment'></a>Example - SSH Bastion Server Deployment
+
+Deploy an SSH bastion server for secure cluster access using the Helm chart boilerplate.
+
+See [README.md](./charts/common/README.md) for more information.
 
 ```bash
 cd helm-chart-boilerplate
-helm upgrade --install ingress-nginx ./charts/ingress-nginx --namespace default --values ./examples/ingress-nginx-confd/values-override.yaml
+helm upgrade --install sshd ./charts/common \
+  --values ./examples/common-sshd/values-override.yaml
 ```
 
-###  1.2. <a name='Example-Ingress-nginxusing80443HostPorts'></a>Example - Ingress-nginx using 80/443 HostPorts
+###  4.2. <a name='Example-AutoscalingBackendService'></a>Example - Autoscaling Backend Service
 
+Deploy a backend microservice with horizontal pod autoscaling using the Helm boilerplate.
 
-1. Install the nginx ingress controller 
+See [README.md](./charts/common/README.md) for more information.
 
 ```bash
 cd helm-chart-boilerplate
-helm upgrade --install ingress-nginx ./charts/ingress-nginx --namespace default --values ./examples/ingress-nginx-hostport/values-override.yaml
+helm upgrade --install myrelease ./charts/common \
+  --values ./examples/common-backend-autoscaling/values-override.yaml
 ```
 
-2. Install Sample application hosted on https://sample.test.io
+###  4.3. <a name='Example-CompleteFeatureDemonstration'></a>Example - Complete Feature Demonstration
 
-NOTE: Namespace field must match up to value of `$backend` in [configmap-confd.yaml](../../charts/ingress-nginx/templates/configmap-confd.yaml) 
+This example demonstrates all features of the Helm chart boilerplate:
 
-```bash
-kubectl apply -f ./charts/ingress-nginx/_sample-pod.yaml
-```
+- InitContainer to sync AWS S3 bucket contents to container `/app/data`
+- Helm webhook executed prior to starting runtime container
+- ConfigMap and Secret management
+- Persistent storage
+- Multiple services
 
-3. Test connectivity 
-
-See output from step 1
-
-
-###  1.3. <a name='Example-Ingress-nginxusingNodePortswithself-signedSSLcertificatetermination'></a>Example - Ingress-nginx using NodePorts with self-signed SSL certificate termination
-
-See [example-raw-output.yaml](./examples/ingress-nginx-ssl-selfsigned/example-raw-output.yaml) for example files outputted by helm templating.
-
-1. Create Kind cluster
+**Prerequisites**: Configure AWS credentials and ECR access
 
 ```bash
-cd helm-chart-boilerplate
-kind create cluster --name kind --config ./examples/ingress-nginx-ssl-selfsigned/cluster.yaml
-```
+export AWS_ACCOUNT=123456789012
+export AWS_REGION=us-east-1
 
-2. Create self-signed certificate files
-
-```bash
-
-cd helm-chart-boilerplate/examples/ingress-nginx-ssl-selfsigned
-mkdir -p certs
-cd certs
-openssl req -x509 -sha256 -newkey rsa:4096 -keyout ca.key -out ca.crt -days 356 -nodes -subj '/CN=Self-Signed Cert Authority' 
-openssl req -new -newkey rsa:4096 -keyout sample.key -out sample.csr -subj '/CN=sample.test.io'
-#Remember this password for step 2
-
-#Generate the Client Key, and Certificate and Sign with the CA Certificate
-openssl x509 -req -sha256 -days 730 -in sample.csr -CA ca.crt -CAkey ca.key -set_serial 01 -out sample.crt 
-```
-
-3. Store the encryption password in the configMap
-
-Edit the content of `ssh_password_file` in [configmap-conf.yaml](./charts/ingress-nginx/templates/configmap-conf.yaml). "hello" is used as an example default.
-
-
-4. Create K8s secrets with certificates and key
-
-```bash
-cd helm-chart-boilerplate
-kubectl delete secret --ignore-not-found=true "ingress-nginx-certs" -n default ; kubectl create secret generic "ingress-nginx-certs" -n default --from-file=tls.key=./examples/ingress-nginx-ssl-selfsigned/sample.key --from-file=tls.crt=./examples/ingress-nginx-ssl-selfsigned/sample.crt ; 
-```
-
-5. Install the nginx ingress controller 
-
-```bash
-cd helm-chart-boilerplate
-helm upgrade --install ingress-nginx ./charts/ingress-nginx --namespace default --values ./examples/ingress-nginx-ssl-selfsigned/values-override.yaml
-```
-
-6. Install Sample application hosted on https://sample.test.io
-
-NOTE: Namespace field must match up to value of `$backend` in [configmap-confd.yaml](./charts/ingress-nginx/templates/configmap-confd.yaml) 
-
-```bash
-kubectl apply -f ./charts/ingress-nginx/_sample-pod.yaml
-```
-
-7. Test connectivity 
-
-See output from step 3
-
-
-###  1.4. <a name='Example-Ingress-nginxusing3306HostPortformysqlTCPbackend'></a>Example - Ingress-nginx using 3306 HostPort for mysql TCP backend
-
-See [example-raw-output.yaml](./examples/ingress-nginx-tcp/example-raw-output.yaml) for example files outputted by helm templating.
-
-1. Create a new `mysql.conf` file with TCP listener in [configmap-confd.yaml](./charts/ingress-nginx/templates/configmap-confd.yaml)
-
-
-2. Install the nginx ingress controller 
-
-
-```bash
-cd helm-chart-boilerplate
-helm upgrade --install ingress-nginx ./charts/ingress-nginx --namespace default --values ./examples/ingress-nginx-tcp/values-override.yaml
-```
-
-
-3. Install Sample application hosted on https://sample.test.io
-
-NOTE: Namespace field must match up to value of `$backend` in [configmap-confd.yaml](./charts/ingress-nginx/templates/configmap-confd.yaml) 
-
-```bash
-kubectl apply -f ../../charts/ingress-nginx/_sample-pod.yaml
-```
-
-4. Test connectivity 
-
-See output from step 2
-
-###  1.5. <a name='Example-Ingress-nginxAWSNLBwithNodePortsandIPwhitelisting'></a>Example - Ingress-nginx AWS NLB with NodePorts and IP whitelisting
-
-See [example-raw-output.yaml](./examples/ingress-nginx-whitelisting/example-raw-output.yaml) for example files outputted by helm templating.
-
-1) Enable `PROXY_PROTOCOL` on the AWS NLB so we can use IP whitelisting for Jenkins
-
-- First retreive the ARN of the HTTPS target group using the AWS console
-
-- Configure NLB to use `proxy_protocol` with a `TargetGroup` attribute
-
-For example:
-
-`aws elbv2 modify-target-group-attributes --attributes Key=proxy_protocol_v2.enabled,Value=true --target-group-arn arn:aws:elasticloadbalancing:us-east-1:304793330600:targetgroup/eks-cluster-nlb-https-tg-80db4d8/0f41d883eebbc37e`
-
-2. Install ingress-nginx 
-
-```bash
-cd helm-chart-boilerplate
-helm upgrade --install ingress-nginx ./charts/ingress-nginx --namespace default --values ./examples/ingress-nginx-whitelisting/values-override.yaml
-```
-
-3. Install Sample application hosted on https://sample.test.io
-
-NOTE: Namespace field must match up to value of `$backend` in [configmap-confd.yaml](./charts/ingress-nginx/templates/configmap-confd.yaml) 
-
-```bash
-kubectl apply -f ../../charts/ingress-nginx/_sample-pod.yaml
-```
-
-4. Test connectivity 
-
-See output from step 2
-
-
-
-##  2. <a name='Common'></a>Common
-
-A generic helm chart to deploy a multitude of applications to Kubernetes using just a single input file `values-override.yaml`.
-
-Features:
-- Secrets mounted environment variables `.Values.secenv`
-- Secrets mounted in-line `.Values.secret.files`
-- ConfigMap mounted environment variables `.Values.configenv`
-- ConfigMap mounted in-line `.Values.configMap.files`
-- Services specified in-line `.Values.services`
-- Redis side car container `.Values.RedisSidecar`
-- InitContainers `.Values.initContainers`
-- Helm Hooks `.Values.hook`
-- PersistentVolume and PersistentVolumeClaim creation in-line `.Values.persistence`
-
-See [values.yaml](./charts/common/values.yaml) for full list of features
-
-###  2.1. <a name='Example-HelmChartforSSHbastionserver'></a>Example - Helm Chart for SSH bastion server 
-
-See [README.md](./charts/common/README.md) for more information
-
-```bash
-cd helm-chart-boilerplate
-helm upgrade --install sshd ./charts/common --values ./examples/common-sshd/values-override.yaml
-```
-
-
-
-###  2.2. <a name='Example-Autoscalingbackendservice'></a>Example - Autoscaling backend service
-
-See [README.md](./charts/common/README.md) for more information
-
-```bash
-cd helm-chart-boilerplate
-helm upgrade --install myrelease ./charts/common --values ./examples/common-backend-autoscaling/values-override.yaml
-```
-
-###  2.3. <a name='Example-Completedeploymentoffullcommonfeatures'></a>Example - Complete deployment of full common features
-
-See [README.md](./charts/common/README.md) for more information
-
-Features:
-
-- Runs initContainer to sync contents of AWS_S3_BUCKET_NAME to runtime container `/app/data`
-- Runs a Helm webhook prior to starting runtime container
-
-
-```bash
-export AWS_ACCOUNT=123
-export AWS_REGION=
 kubectl delete secret regcred --ignore-not-found && \
-kubectl create secret regcred \
+kubectl create secret docker-registry regcred \
   --docker-server=${AWS_ACCOUNT}.dkr.ecr.${AWS_REGION}.amazonaws.com \
   --docker-username=AWS \
   --docker-password=$(aws ecr get-login-password) \
   --namespace=app
 ```
 
+**Deploy application**:
 
-- Example 1 install command 
 ```bash
 cd helm-chart-boilerplate
-helm upgrade --install myrelease ./charts/common --values ./examples/common-complete/values-override.yaml
+helm upgrade --install myrelease ./charts/common \
+  --values ./examples/common-complete/values-override.yaml \
+  --namespace app
 ```
 
-- Example 2 install command 
+**Advanced deployment with runtime variables**:
 
 ```bash
- export AWS_SECRET_ACCESS_KEY # AWS credential for initContainer s3 copy job
- export RABBIT_PASSWD=
-helm upgrade --install myrelease ./charts/common --values ./values-override.yaml --namespace app --set secenv.RABBIT_PASSWD=NadmapyefHybIdviGlyilguvminorcAu  --image.pullPolicy=Always --set "initContainers[0].env[1].value=${AWS_SECRET_ACCESS_KEY}"
+export AWS_SECRET_ACCESS_KEY=<your-secret-key>
+export RABBIT_PASSWD=<rabbitmq-password>
+
+helm upgrade --install myrelease ./charts/common \
+  --values ./examples/common-complete/values-override.yaml \
+  --namespace app \
+  --set secenv.RABBIT_PASSWD=${RABBIT_PASSWD} \
+  --set image.pullPolicy=Always \
+  --set "initContainers[0].env[1].value=${AWS_SECRET_ACCESS_KEY}"
 ```
 
-###  2.4. <a name='Example-SimpleNodeJSexpressserverwithrawYamlinjection'></a>Example - Simple NodeJS express server with rawYaml injection
+###  4.4. <a name='Example-NodeJSExpressApplication'></a>Example - NodeJS Express Application
 
-See [README.md](./charts/common/README.md) for more information
+Deploy a NodeJS Express server with rawYAML injection using the Helm boilerplate.
+
+See [README.md](./charts/common/README.md) for more information.
 
 ```bash
 cd helm-chart-boilerplate
 export DB_PASSWORD=pass123
-helm upgrade --install node-express ./charts/common --values ./examples/common-node-express/values-override.yaml --set secenv.DB_PASSWORD=${DB_PASSWORD}
+
+helm upgrade --install node-express ./charts/common \
+  --values ./examples/common-node-express/values-override.yaml \
+  --set secenv.DB_PASSWORD=${DB_PASSWORD}
 ```
 
-###  2.5. <a name='Example-HelmChartforOrleansKubernetesapplication'></a>Example - Helm Chart for Orleans Kubernetes application
+###  4.5. <a name='Example-OrleansKubernetesApplication'></a>Example - Orleans Kubernetes Application
 
-See [README.md](./charts/common/README.md) for more information
+Deploy Microsoft Orleans applications with RBAC using the Helm chart boilerplate.
+
+See [README.md](./charts/common/README.md) for more information.
 
 ```bash
 cd helm-chart-boilerplate
 export DB_PASSWORD=pass123
-helm upgrade --install node-express ./charts/common --values ./examples/common-orleans/values-override.yaml --set secenv.DB_PASSWORD=${DB_PASSWORD}
+
+helm upgrade --install orleans-app ./charts/common \
+  --values ./examples/common-orleans/values-override.yaml \
+  --set secenv.DB_PASSWORD=${DB_PASSWORD}
 ```
 
-###  2.6. <a name='Example-SimpleNginxwithstaticfilemounts'></a>Example - Simple Nginx with static file mounts
+###  4.6. <a name='Example-StaticNginxFileServer'></a>Example - Static Nginx File Server
 
+Deploy Nginx with static file mounts using the Helm boilerplate.
 
 ```bash
 cd helm-chart-boilerplate
-helm upgrade --install common-nginx ./charts/common --values ./examples/common-nginx-static/values-override.yaml
+helm upgrade --install common-nginx ./charts/common \
+  --values ./examples/common-nginx-static/values-override.yaml
 ```
 
-###  2.7. <a name='Example-Tektonhelmchart'></a>Example - Tekton helm chart
+##  5. <a name='Configuration'></a>Configuration
 
-TBC
+### Helm Values Configuration
+
+See [values.yaml](./charts/common/values.yaml) for all available configuration options.
+
+### Key Configuration Sections
+
+**Basic Deployment**:
+```yaml
+replicaCount: 3
+image:
+  repository: myregistry/myapp
+  tag: "1.0.0"
+```
+
+**ConfigMap and Secrets**:
+```yaml
+configenv:
+  MY_VAR: "value"
+secenv:
+  MY_SECRET: "secretvalue"
+```
+
+**Autoscaling**:
+```yaml
+hpa:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 10
+```
+
+**Storage**:
+```yaml
+persistence:
+  enabled: true
+  size: 10Gi
+  mountPath: /data
+```
+
+##  6. <a name='Contributing'></a>Contributing & Support
+
+### How to Contribute to Helm Chart Boilerplate
+
+We welcome contributions! To contribute:
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+### Get Help
+
+- **Issues**: [GitHub Issues](https://github.com/cogitogroupltd/helm-chart-boilerplate/issues)
+- **Documentation**: [docs/](./docs/)
+- **Examples**: [examples/](./examples/)
+- **Blog**: [Cogito Group Blog](https://cogitogroup.co.uk/blog)
+
+### Stay Updated
+
+- **Star this repository** to receive updates about new features
+- **Watch releases** for notifications about new versions
+- Follow [Cogito Group](https://cogitogroup.co.uk) for Kubernetes and DevOps insights
+
+##  7. <a name='Support'></a>Related Projects & Resources
+
+- [Pure Ingress-Nginx Helm Chart](https://github.com/cogitogroupltd/pure-ingress-nginx) - Native Nginx ingress controller
+- [Tekton Helm Chart](https://github.com/cogitogroupltd/tekton-helm-chart) - Tekton CI/CD pipelines
+- [Kubernetes Documentation](https://kubernetes.io/docs/)
+- [Helm Documentation](https://helm.sh/docs/)
+
+## License
+
+This Universal Helm Chart Boilerplate is licensed under the terms specified in the LICENSE file.
+
+Copyright [2024] [Cogito Group Ltd]
+
+---
+
+**Keywords**: Helm Chart, Kubernetes, Helm Boilerplate, Universal Helm Chart, Kubernetes Deployment, Cloud Native, DevOps, Microservices, ConfigMap, Secrets, HPA, Autoscaling, PersistentVolume, Kubernetes Template, Helm Template, Generic Helm Chart
